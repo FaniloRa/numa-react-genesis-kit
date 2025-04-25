@@ -1,153 +1,139 @@
 
-import React, { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { FileText, Eye } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { Folder, UserRole } from "@/types";
+import { fetchFolders } from "./FoldersService";
+import FolderCard from "./components/FolderCard";
+import FolderDetailView from "./components/FolderDetailView";
+import CreateFolderDialog from "./components/CreateFolderDialog";
+import { Search, Plus } from "lucide-react";
 
 const FoldersPage: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<string>("plaquettes");
+  const { toast } = useToast();
+  const { auth, hasRole } = useAuth();
+  
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [filteredFolders, setFilteredFolders] = useState<Folder[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Mock data for folders
-  const folders = [
-    { id: 1, name: "Projet A", client: "Client 1", createdAt: "2023-01-15", agent: "Agent Smith" },
-    { id: 2, name: "Projet B", client: "Client 2", createdAt: "2023-02-10", agent: "Agent Johnson" },
-    { id: 3, name: "Projet C", client: "Client 3", createdAt: "2023-03-05", agent: "Agent Brown" },
-  ];
+  const isAgent = hasRole([UserRole.AGENT, UserRole.ADMIN]);
 
-  const offerPlates = [
-    { id: 1, name: "Plaquette Standard", folder: "Projet A", createdAt: "2023-01-20", status: "sent" },
-    { id: 2, name: "Plaquette Premium", folder: "Projet B", createdAt: "2023-02-15", status: "draft" },
-  ];
+  const loadFolders = async () => {
+    if (!auth.user) return;
+    
+    try {
+      setLoading(true);
+      const data = await fetchFolders(auth.user.id, isAgent);
+      setFolders(data);
+      setFilteredFolders(data);
+    } catch (error: any) {
+      toast({
+        title: "Erreur de chargement",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  const quotes = [
-    { id: 1, name: "Devis #2023-001", folder: "Projet A", createdAt: "2023-01-25", status: "approved" },
-    { id: 2, name: "Devis #2023-002", folder: "Projet C", createdAt: "2023-03-10", status: "pending" },
-  ];
+  useEffect(() => {
+    loadFolders();
+  }, [auth.user, isAgent]);
+
+  useEffect(() => {
+    if (searchTerm.trim() === "") {
+      setFilteredFolders(folders);
+    } else {
+      const filtered = folders.filter(folder => 
+        folder.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setFilteredFolders(filtered);
+    }
+  }, [searchTerm, folders]);
+
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
+
+  if (selectedFolder) {
+    return (
+      <FolderDetailView 
+        folder={selectedFolder} 
+        onBack={() => setSelectedFolder(null)} 
+      />
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dossiers</h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {folders.map((folder) => (
-          <Card key={folder.id}>
-            <CardHeader>
-              <CardTitle>{folder.name}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Client:</span>
-                  <span className="text-sm font-medium">{folder.client}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Agent:</span>
-                  <span className="text-sm font-medium">{folder.agent}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-sm text-muted-foreground">Créé le:</span>
-                  <span className="text-sm font-medium">{new Date(folder.createdAt).toLocaleDateString()}</span>
-                </div>
-                <Button className="w-full mt-4" variant="outline">
-                  Voir le dossier
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      <div className="flex flex-wrap justify-between items-center gap-4">
+        <h1 className="text-3xl font-bold">Dossiers</h1>
+        {isAgent && (
+          <Button onClick={() => setDialogOpen(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Nouveau dossier
+          </Button>
+        )}
       </div>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Contenu des dossiers</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Tabs defaultValue="plaquettes" value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="mb-4">
-              <TabsTrigger value="plaquettes">Plaquettes d'offres</TabsTrigger>
-              <TabsTrigger value="devis">Devis</TabsTrigger>
-            </TabsList>
-            <TabsContent value="plaquettes">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nom</TableHead>
-                    <TableHead>Dossier</TableHead>
-                    <TableHead>Date de création</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {offerPlates.map((plate) => (
-                    <TableRow key={plate.id}>
-                      <TableCell className="font-medium">{plate.name}</TableCell>
-                      <TableCell>{plate.folder}</TableCell>
-                      <TableCell>{new Date(plate.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <span 
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            plate.status === 'sent' 
-                              ? 'bg-blue-100 text-blue-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {plate.status === 'sent' ? 'Envoyée' : 'Brouillon'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <Eye className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-            <TabsContent value="devis">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Référence</TableHead>
-                    <TableHead>Dossier</TableHead>
-                    <TableHead>Date de création</TableHead>
-                    <TableHead>Statut</TableHead>
-                    <TableHead className="text-right">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {quotes.map((quote) => (
-                    <TableRow key={quote.id}>
-                      <TableCell className="font-medium">{quote.name}</TableCell>
-                      <TableCell>{quote.folder}</TableCell>
-                      <TableCell>{new Date(quote.createdAt).toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <span 
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            quote.status === 'approved' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}
-                        >
-                          {quote.status === 'approved' ? 'Approuvé' : 'En attente'}
-                        </span>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button variant="ghost" size="icon">
-                          <FileText className="h-4 w-4" />
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TabsContent>
-          </Tabs>
-        </CardContent>
-      </Card>
+      
+      <div className="flex flex-col md:flex-row gap-4 items-center">
+        <div className="relative flex-1 w-full">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Rechercher un dossier..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={handleSearch}
+          />
+        </div>
+      </div>
+      
+      {loading ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-36 bg-muted animate-pulse rounded-md" />
+          ))}
+        </div>
+      ) : filteredFolders.length > 0 ? (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {filteredFolders.map((folder) => (
+            <FolderCard
+              key={folder.id}
+              folder={folder}
+              onSelect={setSelectedFolder}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-12 border rounded-md">
+          <p className="text-muted-foreground">Aucun dossier trouvé</p>
+          {isAgent && (
+            <Button 
+              variant="link" 
+              className="mt-2" 
+              onClick={() => setDialogOpen(true)}
+            >
+              Créer un nouveau dossier
+            </Button>
+          )}
+        </div>
+      )}
+      
+      {isAgent && (
+        <CreateFolderDialog
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onSuccess={loadFolders}
+        />
+      )}
     </div>
   );
 };

@@ -1,117 +1,139 @@
 
-import React from "react";
-import { Navigate, useNavigate, Link } from "react-router-dom";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useAuth } from "@/lib/auth";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { UserRole } from "@/types";
+import { Label } from "@/components/ui/label";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/lib/auth";
+import AuthLayout from "./components/AuthLayout";
+import { useToast } from "@/hooks/use-toast";
+import { seedOffers, seedAdminUser, seedAgentUser } from "@/lib/seed-data";
 
-const formSchema = z.object({
-  email: z.string().email("Veuillez entrer un email valide"),
-  password: z.string().min(6, "Le mot de passe doit contenir au moins 6 caractères"),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-const Login: React.FC = () => {
-  const { auth, signIn } = useAuth();
+const Login = () => {
+  const { signIn } = useAuth();
+  const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const form = useForm<FormData>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  });
-
-  const { isSubmitting } = form.formState;
-
-  const onSubmit = async (data: FormData) => {
-    const { error } = await signIn(data.email, data.password);
-    if (!error) {
-      navigate("/dashboard"); // Default route after login
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email || !password) {
+      toast({
+        title: "Champs requis",
+        description: "Veuillez remplir tous les champs.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    setLoading(true);
+    
+    try {
+      // Seed data (for demo purposes)
+      await seedOffers();
+      await seedAdminUser();
+      await seedAgentUser();
+      
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        throw error;
+      }
+      
+      navigate("/dashboard");
+    } catch (error: any) {
+      toast({
+        title: "Erreur de connexion",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
-  // Redirect if already logged in
-  if (auth.user && !auth.isLoading) {
-    // Redirect based on user role
-    if (auth.user.role === UserRole.ADMIN) {
-      return <Navigate to="/dashboard" />;
-    } else if (auth.user.role === UserRole.AGENT) {
-      return <Navigate to="/dashboard" />;
-    } else {
-      return <Navigate to="/dashboard" />;
-    }
-  }
-
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-soft-purple to-soft-blue p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-vivid-purple">i-numa</CardTitle>
-          <CardDescription>Connectez-vous à votre compte</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input placeholder="exemple@email.com" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Mot de passe</FormLabel>
-                    <FormControl>
-                      <Input type="password" placeholder="••••••" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Connexion en cours..." : "Se connecter"}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-        <CardFooter className="flex-col space-y-2">
-          <div className="text-center text-sm">
-            <span className="text-muted-foreground">
-              Vous n'avez pas de compte ?{" "}
-            </span>
-            <Link to="/register" className="text-vivid-purple hover:underline">
-              Inscrivez-vous
+    <AuthLayout
+      title="Connexion"
+      description="Entrez vos identifiants pour vous connecter"
+      footer={
+        <div className="text-center w-full">
+          <p className="text-sm text-muted-foreground">
+            Vous n'avez pas de compte ?{" "}
+            <Link to="/register" className="text-primary font-medium">
+              S'inscrire
+            </Link>
+          </p>
+        </div>
+      }
+    >
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="votre@email.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="flex justify-between">
+            <Label htmlFor="password">Mot de passe</Label>
+            <Link to="#" className="text-sm text-primary">
+              Mot de passe oublié ?
             </Link>
           </div>
-        </CardFooter>
-      </Card>
-    </div>
+          <Input
+            id="password"
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={loading}
+            required
+          />
+        </div>
+        
+        <Button type="submit" className="w-full" disabled={loading}>
+          {loading ? "Connexion en cours..." : "Se connecter"}
+        </Button>
+        
+        <div className="text-center text-sm">
+          <p className="text-muted-foreground">
+            Utilisateurs de démonstration:
+          </p>
+          <div className="flex justify-around mt-2">
+            <Button
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setEmail("admin@inuma.fr");
+                setPassword("Admin123!");
+              }}
+            >
+              Admin
+            </Button>
+            <Button
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setEmail("agent@inuma.fr");
+                setPassword("Agent123!");
+              }}
+            >
+              Agent
+            </Button>
+          </div>
+        </div>
+      </form>
+    </AuthLayout>
   );
 };
 

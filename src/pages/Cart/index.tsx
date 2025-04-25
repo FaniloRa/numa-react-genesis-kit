@@ -1,17 +1,46 @@
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Trash2 } from "lucide-react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/lib/auth";
+import { CartItem } from "@/types";
+import { fetchCartItems } from "./CartService";
+import CartItemRow from "./components/CartItemRow";
+import CreateOfferPlateDialog from "./components/CreateOfferPlateDialog";
+import { useNavigate } from "react-router-dom";
 
 const CartPage: React.FC = () => {
-  // Mock data for the cart
-  const cartItems = [
-    { id: 1, name: "Offre Standard", description: "Description de l'offre", price: 129.99, quantity: 1 },
-    { id: 2, name: "Offre Premium", description: "Description de l'offre", price: 249.99, quantity: 1 },
-    { id: 3, name: "Option Supplémentaire", description: "Description de l'option", price: 49.99, quantity: 2 },
-  ];
+  const { toast } = useToast();
+  const { auth } = useAuth();
+  const navigate = useNavigate();
+  
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const loadCartItems = async () => {
+    if (!auth.user) return;
+    
+    try {
+      setLoading(true);
+      const items = await fetchCartItems(auth.user.id);
+      setCartItems(items);
+    } catch (error: any) {
+      toast({
+        title: "Erreur de chargement",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadCartItems();
+  }, [auth.user]);
 
   return (
     <div className="space-y-6">
@@ -22,38 +51,68 @@ const CartPage: React.FC = () => {
           <CardTitle>Articles sélectionnés</CardTitle>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Article</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Prix unitaire</TableHead>
-                <TableHead className="text-right">Quantité</TableHead>
-                <TableHead className="w-[70px]"></TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {cartItems.map((item) => (
-                <TableRow key={item.id}>
-                  <TableCell className="font-medium">{item.name}</TableCell>
-                  <TableCell>{item.description}</TableCell>
-                  <TableCell className="text-right">{item.price.toFixed(2)} €</TableCell>
-                  <TableCell className="text-right">{item.quantity}</TableCell>
-                  <TableCell>
-                    <Button variant="ghost" size="icon" className="h-7 w-7">
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
+          {loading ? (
+            <div className="h-36 bg-muted animate-pulse rounded-md" />
+          ) : cartItems.length > 0 ? (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Article</TableHead>
+                  <TableHead>Description</TableHead>
+                  <TableHead className="text-right">Prix unitaire</TableHead>
+                  <TableHead className="text-right">Quantité</TableHead>
+                  <TableHead className="w-[70px]"></TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {cartItems.map((item) => (
+                  <CartItemRow 
+                    key={item.id} 
+                    item={item} 
+                    onUpdate={loadCartItems} 
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">Votre panier est vide</p>
+              <Button 
+                variant="link" 
+                className="mt-2"
+                onClick={() => navigate("/marketplace")}
+              >
+                Parcourir la marketplace
+              </Button>
+            </div>
+          )}
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline">Continuer mes achats</Button>
-          <Button>Créer une plaquette d'offres</Button>
-        </CardFooter>
+        {cartItems.length > 0 && (
+          <CardFooter className="flex justify-between">
+            <Button 
+              variant="outline"
+              onClick={() => navigate("/marketplace")}
+            >
+              Continuer mes achats
+            </Button>
+            <Button onClick={() => setDialogOpen(true)}>
+              Créer une plaquette d'offres
+            </Button>
+          </CardFooter>
+        )}
       </Card>
+
+      {auth.user && (
+        <CreateOfferPlateDialog
+          userId={auth.user.id}
+          open={dialogOpen}
+          onClose={() => setDialogOpen(false)}
+          onSuccess={() => {
+            loadCartItems();
+            navigate("/folders");
+          }}
+        />
+      )}
     </div>
   );
 };
