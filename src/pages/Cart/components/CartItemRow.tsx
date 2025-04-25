@@ -74,7 +74,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
     <TableRow>
       <TableCell className="font-medium">{item.offer.name}</TableCell>
       <TableCell>{item.offer.description}</TableCell>
-      <TableCell className="text-right">{Number(item.offer.price).toFixed(2)} €</TableCell>
+      <TableCell className="text-right">{Number(item.offer.priceMonthly).toFixed(2)} €</TableCell>
       <TableCell>
         <div className="flex items-center justify-end gap-2">
           <Input

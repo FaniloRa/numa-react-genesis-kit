@@ -103,7 +103,7 @@ const CreateQuoteDialog: React.FC<CreateQuoteDialogProps> = ({
       
       // Calculate the total price
       const total = items.reduce((sum, item) => {
-        return sum + (Number(item.offer.price) * item.quantity);
+        return sum + (Number(item.offer.priceMonthly) * item.quantity);
       }, 0);
       
       setTotalPrice(total);

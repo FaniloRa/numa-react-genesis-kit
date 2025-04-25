@@ -238,10 +238,10 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                       <TableRow key={`${item.offerId}-${item.quantity}`}>
                         <TableCell className="font-medium">{item.offer.name}</TableCell>
                         <TableCell className="max-w-xs truncate">{item.offer.description}</TableCell>
-                        <TableCell className="text-right">{Number(item.offer.price).toFixed(2)} €</TableCell>
+                        <TableCell className="text-right">{Number(item.offer.priceMonthly).toFixed(2)} €</TableCell>
                         <TableCell className="text-right">{item.quantity}</TableCell>
                         <TableCell className="text-right">
-                          {(Number(item.offer.price) * item.quantity).toFixed(2)} €
+                          {(Number(item.offer.priceMonthly) * item.quantity).toFixed(2)} €
                         </TableCell>
                       </TableRow>
                     ))}
