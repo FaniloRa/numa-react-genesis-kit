@@ -45,13 +45,25 @@ const AdminDashboard: React.FC = () => {
         supabase.from("folders").select("*", { count: "exact" }),
         supabase
           .from("quotes")
-          .select("id, total_amount, status, created_at, profiles(first_name, last_name)")
+          .select(`
+            id, 
+            total_amount, 
+            status, 
+            created_at, 
+            profiles:profiles(first_name, last_name)
+          `)
           .eq("status", "pending")
           .order("created_at", { ascending: false })
           .limit(5),
         supabase
           .from("quotes")
-          .select("id, total_amount, status, created_at, profiles(first_name, last_name)")
+          .select(`
+            id, 
+            total_amount, 
+            status, 
+            created_at, 
+            profiles:profiles(first_name, last_name)
+          `)
           .order("created_at", { ascending: false })
           .limit(10)
       ]);
@@ -77,17 +89,29 @@ const AdminDashboard: React.FC = () => {
         },
       ]);
       
-      setPendingQuotes(pendingQuotesData || []);
-      
-      const activities = (recentActivityData || []).map(item => ({
-        id: item.id,
-        type: "quote",
-        name: `Devis #${item.id.substring(0, 8)} - ${
-          item.profiles?.first_name || "Agent"} ${item.profiles?.last_name || ""
-        }`,
-        date: item.created_at,
-        status: item.status,
+      // Add null checks and type safety for pendingQuotes
+      setPendingQuotes((pendingQuotesData || []).map(quote => {
+        const profiles = quote.profiles as { first_name?: string, last_name?: string } | null;
+        return {
+          ...quote,
+          profiles: profiles || { first_name: "Agent", last_name: "" }
+        };
       }));
+      
+      // Add null checks and type safety for recentActivity
+      const activities = (recentActivityData || []).map(item => {
+        const profiles = item.profiles as { first_name?: string, last_name?: string } | null;
+        const firstName = profiles?.first_name || "Agent";
+        const lastName = profiles?.last_name || "";
+        
+        return {
+          id: item.id,
+          type: "quote",
+          name: `Devis #${item.id.substring(0, 8)} - ${firstName} ${lastName}`,
+          date: item.created_at,
+          status: item.status,
+        };
+      });
       
       setRecentActivity(activities);
     } catch (error) {

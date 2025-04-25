@@ -9,6 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { useNavigate } from "react-router-dom";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { DashboardStats } from "./components/DashboardStats";
 
 interface DashboardStat {
   title: string;
@@ -70,10 +71,7 @@ const AgentDashboard: React.FC = () => {
             status,
             created_at,
             client_id,
-            profiles(
-              first_name,
-              last_name
-            )
+            profiles:profiles(first_name, last_name)
           `)
           .eq("agent_id", auth.user.id)
           .eq("status", "approved")
@@ -83,10 +81,7 @@ const AgentDashboard: React.FC = () => {
           .from("folders")
           .select(`
             *,
-            profiles(
-              first_name, 
-              last_name
-            )
+            profiles:profiles(first_name, last_name)
           `)
           .eq("agent_id", auth.user.id)
           .order("created_at", { ascending: false })
@@ -99,10 +94,7 @@ const AgentDashboard: React.FC = () => {
             status,
             created_at,
             client_id,
-            profiles(
-              first_name,
-              last_name
-            )
+            profiles:profiles(first_name, last_name)
           `)
           .eq("agent_id", auth.user.id)
           .order("created_at", { ascending: false })
@@ -131,33 +123,42 @@ const AgentDashboard: React.FC = () => {
         },
       ]);
       
-      // Set pending quotes
-      setPendingQuotes(pendingQuotesData?.map(quote => {
+      // Set pending quotes with type safety
+      setPendingQuotes((pendingQuotesData || []).map(quote => {
+        const profiles = quote.profiles as { first_name?: string, last_name?: string } | null;
         return {
           ...quote,
-          profiles: quote.profiles || { first_name: "Client", last_name: "" }
+          profiles: profiles || { first_name: "Client", last_name: "" }
         };
-      }) || []);
+      }));
       
       // Transform recent activity, safely handling potentially missing data
-      const folderActivities = (recentFoldersData || []).map(folder => ({
-        id: folder.id,
-        type: "folder",
-        name: `Dossier: ${folder.name} - ${
-          folder.profiles?.first_name || "Client"} ${folder.profiles?.last_name || ""
-        }`,
-        date: folder.created_at,
-      }));
+      const folderActivities = (recentFoldersData || []).map(folder => {
+        const profiles = folder.profiles as { first_name?: string, last_name?: string } | null;
+        const firstName = profiles?.first_name || "Client";
+        const lastName = profiles?.last_name || "";
+        
+        return {
+          id: folder.id,
+          type: "folder",
+          name: `Dossier: ${folder.name} - ${firstName} ${lastName}`,
+          date: folder.created_at,
+        };
+      });
       
-      const quoteActivities = (recentQuotesData || []).map(quote => ({
-        id: quote.id,
-        type: "quote",
-        name: `Devis #${quote.id.substring(0, 8)} - ${
-          quote.profiles?.first_name || "Client"} ${quote.profiles?.last_name || ""
-        }`,
-        date: quote.created_at,
-        status: quote.status,
-      }));
+      const quoteActivities = (recentQuotesData || []).map(quote => {
+        const profiles = quote.profiles as { first_name?: string, last_name?: string } | null;
+        const firstName = profiles?.first_name || "Client";
+        const lastName = profiles?.last_name || "";
+        
+        return {
+          id: quote.id,
+          type: "quote",
+          name: `Devis #${quote.id.substring(0, 8)} - ${firstName} ${lastName}`,
+          date: quote.created_at,
+          status: quote.status,
+        };
+      });
       
       const combinedActivities = [...folderActivities, ...quoteActivities]
         .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
@@ -184,38 +185,7 @@ const AgentDashboard: React.FC = () => {
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Tableau de bord agent</h1>
       
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {loading ? (
-          [...Array(3)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader className="pb-2">
-                <div className="h-4 bg-muted rounded w-3/4"></div>
-                <div className="h-8 bg-muted rounded w-1/3 mt-2"></div>
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-muted rounded w-2/3"></div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          stats.map((stat, i) => (
-            <Card key={i}>
-              <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                <div>
-                  <CardTitle className="text-sm font-medium text-muted-foreground">
-                    {stat.title}
-                  </CardTitle>
-                  <div className="text-2xl font-bold">{stat.value}</div>
-                </div>
-                {stat.icon}
-              </CardHeader>
-              <CardContent>
-                <CardDescription>{stat.description}</CardDescription>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
+      <DashboardStats stats={stats} loading={loading} />
       
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
