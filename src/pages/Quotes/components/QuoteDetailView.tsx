@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,7 +6,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Quote, CartItem, UserRole } from "@/types";
 import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus } from "../QuotesService";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, FilePdf, Send, Check, X } from "lucide-react";
+import { ArrowLeft, File, Send, Check, X } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 
@@ -251,7 +250,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
 
               <div className="flex justify-between pt-4">
                 <Button variant="outline">
-                  <FilePdf className="h-4 w-4 mr-2" />
+                  <File className="h-4 w-4 mr-2" />
                   Exporter en PDF
                 </Button>
                 {renderStatusActions()}
