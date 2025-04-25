@@ -48,16 +48,25 @@ export const fetchClientProfiles = async (): Promise<User[]> => {
   try {
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, first_name, last_name, email')
+      .select(`
+        id,
+        email,
+        first_name,
+        last_name,
+        role,
+        created_at
+      `)
       .eq('role', 'client');
     
     if (error) throw error;
+    
     return data.map(profile => ({
       id: profile.id,
-      email: profile.email,
-      firstName: profile.first_name,
-      lastName: profile.last_name,
-      role: 'client'
+      email: profile.email || '',
+      firstName: profile.first_name || '',
+      lastName: profile.last_name || '',
+      role: 'client',
+      createdAt: profile.created_at || new Date().toISOString()
     }));
   } catch (error) {
     console.error("Erreur lors de la récupération des clients :", error);
