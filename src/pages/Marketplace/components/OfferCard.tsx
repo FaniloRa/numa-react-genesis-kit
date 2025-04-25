@@ -42,6 +42,10 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
     }
   };
 
+  if (!offer.isActive) {
+    return null;
+  }
+
   return (
     <Card className="overflow-hidden h-full flex flex-col">
       <div 
@@ -59,8 +63,22 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
         <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
           {offer.description}
         </p>
-        <p className="font-bold">{Number(offer.price).toFixed(2)} €</p>
-        <div className="text-xs text-muted-foreground mt-1 inline-block bg-gray-100 px-2 py-0.5 rounded-full">
+        <div className="space-y-1">
+          {offer.priceMonthly > 0 && (
+            <p className="font-bold">
+              {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-muted-foreground">/mois</span>
+            </p>
+          )}
+          {offer.setupFee > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Frais d'installation : {Number(offer.setupFee).toFixed(2)} €
+            </p>
+          )}
+          {offer.priceMonthly === 0 && offer.setupFee === 0 && (
+            <p className="font-medium text-muted-foreground">Sur devis</p>
+          )}
+        </div>
+        <div className="text-xs text-muted-foreground mt-2 inline-block bg-gray-100 px-2 py-0.5 rounded-full">
           {offer.category}
         </div>
       </CardContent>

@@ -1,4 +1,3 @@
-
 // Utility functions for mapping database fields to TypeScript interfaces
 
 /**
@@ -11,9 +10,11 @@ export const mapOffer = (data: any) => {
     id: data.id,
     name: data.name,
     description: data.description,
-    price: data.price,
     category: data.category,
     imageUrl: data.image_url,
+    priceMonthly: data.price_monthly,
+    setupFee: data.setup_fee,
+    isActive: data.is_active,
     createdAt: data.created_at
   };
 };

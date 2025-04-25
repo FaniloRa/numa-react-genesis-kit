@@ -1,4 +1,3 @@
-
 import React from "react";
 import {
   Dialog,
@@ -87,7 +86,21 @@ const OfferDetailDialog: React.FC<OfferDetailDialogProps> = ({
           
           <div>
             <h3 className="text-lg font-medium">Prix</h3>
-            <p className="text-xl font-bold">{Number(offer.price).toFixed(2)} €</p>
+            <div className="space-y-1 mt-1">
+              {offer.priceMonthly > 0 && (
+                <p className="text-xl font-bold">
+                  {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-muted-foreground">/mois</span>
+                </p>
+              )}
+              {offer.setupFee > 0 && (
+                <p className="text-sm text-muted-foreground">
+                  Frais d'installation : {Number(offer.setupFee).toFixed(2)} €
+                </p>
+              )}
+              {offer.priceMonthly === 0 && offer.setupFee === 0 && (
+                <p className="font-medium text-muted-foreground">Sur devis</p>
+              )}
+            </div>
           </div>
         </div>
         

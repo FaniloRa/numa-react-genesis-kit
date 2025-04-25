@@ -112,8 +112,10 @@ export type Database = {
           description: string
           id: string
           image_url: string | null
+          is_active: boolean
           name: string
-          price: number
+          price_monthly: number
+          setup_fee: number
           updated_at: string | null
         }
         Insert: {
@@ -122,8 +124,10 @@ export type Database = {
           description: string
           id?: string
           image_url?: string | null
+          is_active?: boolean
           name: string
-          price: number
+          price_monthly?: number
+          setup_fee?: number
           updated_at?: string | null
         }
         Update: {
@@ -132,8 +136,10 @@ export type Database = {
           description?: string
           id?: string
           image_url?: string | null
+          is_active?: boolean
           name?: string
-          price?: number
+          price_monthly?: number
+          setup_fee?: number
           updated_at?: string | null
         }
         Relationships: []

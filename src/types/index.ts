@@ -1,4 +1,3 @@
-
 export enum UserRole {
   CLIENT = 'client',
   AGENT = 'agent',
@@ -21,14 +20,16 @@ export interface Offer {
   id: string;
   name: string;
   description: string;
-  price: number;
   category: string;
-  imageUrl?: string;  // This matches what TypeScript expects
+  imageUrl?: string;
+  priceMonthly: number;
+  setupFee: number;
+  isActive: boolean;
   createdAt: string;
 }
 
 export interface CartItem {
-  id?: string;  // Add id property
+  id?: string;
   offerId: string;
   offer: Offer;
   quantity: number;
