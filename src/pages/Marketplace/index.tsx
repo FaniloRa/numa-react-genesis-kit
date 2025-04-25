@@ -2,25 +2,15 @@
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Filter, Search } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { Offer } from "@/types";
 import { fetchOffers, fetchCategories } from "./MarketplaceService";
 import OfferCard from "./components/OfferCard";
 import OfferDetailDialog from "./components/OfferDetailDialog";
-import CategoryFilter from "./components/CategoryFilter";
 import SearchBar from "./components/SearchBar";
 import { UserRole } from "@/types";
-import { 
-  Sheet, 
-  SheetContent, 
-  SheetDescription, 
-  SheetHeader, 
-  SheetTitle, 
-  SheetTrigger,
-  SheetFooter
-} from "@/components/ui/sheet";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Marketplace: React.FC = () => {
   const { toast } = useToast();
@@ -93,83 +83,47 @@ const Marketplace: React.FC = () => {
         )}
       </div>
       
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-3/4">
-          <div className="flex flex-col sm:flex-row gap-4 items-end mb-4">
-            <div className="flex-1">
-              <SearchBar
-                value={searchTerm}
-                onChange={setSearchTerm}
-                onSearch={handleSearch}
-              />
-            </div>
-            
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" className="flex md:hidden items-center gap-2">
-                  <Filter className="h-4 w-4" />
-                  Filtres
-                </Button>
-              </SheetTrigger>
-              <SheetContent>
-                <SheetHeader>
-                  <SheetTitle>Filtres</SheetTitle>
-                  <SheetDescription>
-                    Filtrer les offres par catégorie
-                  </SheetDescription>
-                </SheetHeader>
-                <div className="mt-4">
-                  <CategoryFilter
-                    categories={categories}
-                    selectedCategory={selectedCategory}
-                    onSelectCategory={(cat) => {
-                      setSelectedCategory(cat);
-                      loadOffers();
-                    }}
-                  />
-                </div>
-                <SheetFooter className="mt-4">
-                  <Button onClick={() => {
-                    setSelectedCategory(null);
-                    loadOffers();
-                  }}>
-                    Réinitialiser les filtres
-                  </Button>
-                </SheetFooter>
-              </SheetContent>
-            </Sheet>
-          </div>
-
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[...Array(6)].map((_, i) => (
-                <div key={i} className="h-[300px] bg-muted animate-pulse rounded-md" />
-              ))}
-            </div>
-          ) : offers.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {offers.map((offer) => (
-                <OfferCard
-                  key={offer.id}
-                  offer={offer}
-                  onViewDetails={handleViewDetails}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 border rounded-md">
-              <p className="text-muted-foreground">Aucune offre trouvée</p>
-            </div>
-          )}
-        </div>
+      <div className="space-y-4">
+        <SearchBar
+          value={searchTerm}
+          onChange={setSearchTerm}
+          onSearch={handleSearch}
+        />
         
-        <div className="w-full md:w-1/4 hidden md:block">
-          <CategoryFilter
-            categories={categories}
-            selectedCategory={selectedCategory}
-            onSelectCategory={handleCategorySelect}
-          />
-        </div>
+        <Tabs defaultValue={selectedCategory || "all"} onValueChange={(value) => handleCategorySelect(value === "all" ? null : value)} className="w-full">
+          <TabsList className="w-full overflow-x-auto flex flex-nowrap py-1 justify-start">
+            <TabsTrigger value="all" className="whitespace-nowrap">
+              Toutes les catégories
+            </TabsTrigger>
+            {categories.map((category) => (
+              <TabsTrigger key={category} value={category} className="whitespace-nowrap">
+                {category}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </Tabs>
+        
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="h-[300px] bg-muted animate-pulse rounded-md" />
+            ))}
+          </div>
+        ) : offers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {offers.map((offer) => (
+              <OfferCard
+                key={offer.id}
+                offer={offer}
+                onViewDetails={handleViewDetails}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center py-12 border rounded-md">
+            <p className="text-muted-foreground">Aucune offre trouvée</p>
+          </div>
+        )}
       </div>
 
       {selectedOffer && (

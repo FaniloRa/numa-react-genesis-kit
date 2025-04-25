@@ -48,14 +48,6 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
 
   return (
     <Card className="overflow-hidden h-full flex flex-col">
-      <div 
-        className="h-40 bg-muted"
-        style={
-          offer.imageUrl 
-            ? { backgroundImage: `url(${offer.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } 
-            : {}
-        }
-      />
       <CardHeader>
         <CardTitle className="line-clamp-1">{offer.name}</CardTitle>
       </CardHeader>

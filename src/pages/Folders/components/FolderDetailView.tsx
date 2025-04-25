@@ -6,9 +6,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { Folder, OfferPlate, Quote } from "@/types";
 import { fetchOfferPlatesForFolder, fetchQuotesForFolder } from "../FoldersService";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
+import { useNavigate } from "react-router-dom";
 
 interface FolderDetailViewProps {
   folder: Folder;
@@ -17,6 +18,7 @@ interface FolderDetailViewProps {
 
 const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) => {
   const { toast } = useToast();
+  const navigate = useNavigate();
   
   const [offerPlates, setOfferPlates] = useState<OfferPlate[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
@@ -47,6 +49,66 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
   useEffect(() => {
     loadFolderDetails();
   }, [folder]);
+
+  const handleViewOfferPlateDetails = (plate: OfferPlate) => {
+    // Implementation pour visualiser les plaquettes
+    navigate(`/offer-plates/${plate.id}`);
+  };
+
+  const handleViewQuoteDetails = (quote: Quote) => {
+    navigate(`/quotes/${quote.id}`);
+  };
+
+  const getStatusStyle = (status: string) => {
+    switch (status) {
+      case "draft":
+        return "bg-gray-100 text-gray-800";
+      case "sent":
+        return "bg-blue-100 text-blue-800";
+      case "accepted":
+        return "bg-green-100 text-green-800";
+      case "rejected":
+        return "bg-red-100 text-red-800";
+      case "pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "approved":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  const getStatusText = (status: string, isQuote: boolean = false) => {
+    if (isQuote) {
+      switch (status) {
+        case "pending":
+          return "En attente";
+        case "approved":
+          return "Approuvé";
+        case "sent":
+          return "Envoyé";
+        case "accepted":
+          return "Accepté";
+        case "rejected":
+          return "Rejeté";
+        default:
+          return status;
+      }
+    } else {
+      switch (status) {
+        case "draft":
+          return "Brouillon";
+        case "sent":
+          return "Envoyée";
+        case "accepted":
+          return "Acceptée";
+        case "rejected":
+          return "Rejetée";
+        default:
+          return status;
+      }
+    }
+  };
 
   return (
     <div>
@@ -80,7 +142,7 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
           ) : offerPlates.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {offerPlates.map((plate) => (
-                <Card key={plate.id}>
+                <Card key={plate.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{plate.name}</CardTitle>
                   </CardHeader>
@@ -90,22 +152,15 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
                     </p>
                     <div className="flex justify-between items-center">
                       <span
-                        className={`text-xs px-2 py-1 rounded-full ${
-                          plate.status === "sent"
-                            ? "bg-blue-100 text-blue-800"
-                            : plate.status === "accepted"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
-                        }`}
+                        className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(plate.status)}`}
                       >
-                        {plate.status === "sent"
-                          ? "Envoyée"
-                          : plate.status === "accepted"
-                          ? "Acceptée"
-                          : "Rejetée"}
+                        {getStatusText(plate.status)}
                       </span>
                       
-                      <Button size="sm">Voir détails</Button>
+                      <Button size="sm" onClick={() => handleViewOfferPlateDetails(plate)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir détails
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -128,7 +183,7 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
           ) : quotes.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {quotes.map((quote) => (
-                <Card key={quote.id}>
+                <Card key={quote.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">Devis #{quote.id.substring(0, 8)}</CardTitle>
                   </CardHeader>
@@ -137,28 +192,19 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
                       Créé {formatDistanceToNow(new Date(quote.createdAt), { addSuffix: true, locale: fr })}
                     </p>
                     <div className="flex justify-between items-center">
-                      <div>
+                      <div className="flex flex-col gap-1">
                         <p className="font-medium">{Number(quote.totalAmount).toFixed(2)} €</p>
                         <span
-                          className={`text-xs px-2 py-1 rounded-full ${
-                            quote.status === "pending"
-                              ? "bg-yellow-100 text-yellow-800"
-                              : quote.status === "approved" || quote.status === "accepted"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-red-100 text-red-800"
-                          }`}
+                          className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(quote.status)}`}
                         >
-                          {quote.status === "pending"
-                            ? "En attente"
-                            : quote.status === "approved"
-                            ? "Approuvé"
-                            : quote.status === "accepted"
-                            ? "Accepté"
-                            : "Rejeté"}
+                          {getStatusText(quote.status, true)}
                         </span>
                       </div>
                       
-                      <Button size="sm">Voir détails</Button>
+                      <Button size="sm" onClick={() => handleViewQuoteDetails(quote)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Voir détails
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>

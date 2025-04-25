@@ -1,23 +1,43 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { mapOffers, mapCartItems } from "@/utils/dataMapper";
-import { User, Offer, CartItem, OfferPlate } from "@/types";
+import { User, Offer, CartItem, OfferPlate, UserRole } from "@/types";
 
 export const createOfferPlate = async (
   name: string, 
   agentId: string, 
   clientId: string, 
-  items: CartItem[]
+  items: CartItem[],
+  folderId?: string
 ) => {
   try {
-    // Commencer une transaction
+    // Si aucun dossier n'est fourni, en créer un nouveau
+    let folderData;
+    if (!folderId) {
+      const { data: newFolder, error: folderError } = await supabase
+        .from('folders')
+        .insert({
+          name: `Dossier pour ${name}`,
+          agent_id: agentId,
+          client_id: clientId
+        })
+        .select()
+        .single();
+
+      if (folderError) throw folderError;
+      folderData = newFolder;
+      folderId = newFolder.id;
+    }
+
+    // Créer la plaquette d'offres
     const { data: offerPlateData, error: offerPlateError } = await supabase
       .from('offer_plates')
       .insert({
         name,
         agent_id: agentId,
         client_id: clientId,
-        status: 'draft'
+        status: 'draft',
+        folder_id: folderId
       })
       .select()
       .single();
@@ -37,7 +57,10 @@ export const createOfferPlate = async (
 
     if (itemsError) throw itemsError;
 
-    return offerPlateData;
+    return {
+      offerPlate: offerPlateData,
+      folder: folderData
+    };
   } catch (error) {
     console.error("Erreur lors de la création de la plaquette d'offres :", error);
     throw error;
@@ -65,7 +88,7 @@ export const fetchClientProfiles = async (): Promise<User[]> => {
       email: profile.email || '',
       firstName: profile.first_name || '',
       lastName: profile.last_name || '',
-      role: 'client',
+      role: UserRole.CLIENT,
       createdAt: profile.created_at || new Date().toISOString()
     }));
   } catch (error) {
@@ -90,6 +113,8 @@ export const sendOfferPlateThroughPlatform = async (
       .eq('id', offerPlateId);
 
     if (error) throw error;
+    
+    return true;
   } catch (error) {
     console.error("Erreur lors de l'envoi de la plaquette :", error);
     throw error;
@@ -106,6 +131,7 @@ export const fetchOfferPlateDetails = async (offerPlateId: string) => {
         status, 
         agent_id,
         client_id,
+        folder_id,
         offer_plate_items (
           quantity,
           offers (
@@ -133,6 +159,38 @@ export const fetchOfferPlateDetails = async (offerPlateId: string) => {
     };
   } catch (error) {
     console.error("Erreur lors de la récupération des détails de la plaquette :", error);
+    throw error;
+  }
+};
+
+export const fetchOfferPlatesForFolder = async (folderId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from('offer_plates')
+      .select(`
+        id,
+        name,
+        status,
+        client_id,
+        agent_id,
+        created_at,
+        folder_id
+      `)
+      .eq('folder_id', folderId);
+    
+    if (error) throw error;
+    
+    return data.map(plate => ({
+      id: plate.id,
+      name: plate.name,
+      status: plate.status,
+      clientId: plate.client_id,
+      agentId: plate.agent_id,
+      createdAt: plate.created_at,
+      folderId: plate.folder_id
+    }));
+  } catch (error) {
+    console.error("Erreur lors de la récupération des plaquettes d'offres :", error);
     throw error;
   }
 };

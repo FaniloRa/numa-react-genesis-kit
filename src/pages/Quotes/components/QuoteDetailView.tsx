@@ -5,11 +5,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Quote, CartItem, UserRole } from "@/types";
-import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus } from "../QuotesService";
+import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus, fetchPaymentInfoByQuoteId } from "../QuotesService";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, File, Send, Check, X } from "lucide-react";
+import { ArrowLeft, File, Send, Check, X, Printer } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
+import DevisTemplate from "./DevisTemplate";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 interface QuoteDetailViewProps {
   quote: Quote;
@@ -23,8 +25,10 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
   
   const [quoteDetails, setQuoteDetails] = useState<any>(null);
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
+  const [paymentInfo, setPaymentInfo] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
+  const [showPreview, setShowPreview] = useState(false);
 
   const isAdmin = hasRole(UserRole.ADMIN);
   const isClient = hasRole(UserRole.CLIENT);
@@ -33,13 +37,15 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     try {
       setLoading(true);
       
-      const [details, items] = await Promise.all([
+      const [details, items, payment] = await Promise.all([
         fetchQuoteDetails(quote.id),
-        fetchQuoteItems(quote.offerPlateId)
+        fetchQuoteItems(quote.offerPlateId),
+        fetchPaymentInfoByQuoteId(quote.id).catch(() => null)
       ]);
       
       setQuoteDetails(details);
       setQuoteItems(items);
+      setPaymentInfo(payment);
     } catch (error: any) {
       toast({
         title: "Erreur de chargement",
@@ -76,6 +82,10 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     } finally {
       setProcessingAction(false);
     }
+  };
+
+  const handlePrint = () => {
+    setShowPreview(true);
   };
 
   const getStatusStyle = (status: string) => {
@@ -175,6 +185,9 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
   };
 
   const totalAmount = quoteDetails?.total_amount || 0;
+  const clientName = quoteDetails?.client_id ? 
+    `${quoteDetails?.client?.first_name || ""} ${quoteDetails?.client?.last_name || ""}` : 
+    "Client";
 
   return (
     <div>
@@ -250,9 +263,9 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
               </div>
 
               <div className="flex justify-between pt-4">
-                <Button variant="outline">
-                  <File className="h-4 w-4 mr-2" />
-                  Exporter en PDF
+                <Button variant="outline" onClick={handlePrint}>
+                  <Printer className="h-4 w-4 mr-2" />
+                  Aperçu Devis
                 </Button>
                 {renderStatusActions()}
               </div>
@@ -260,6 +273,23 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
           )}
         </CardContent>
       </Card>
+      
+      <Dialog open={showPreview} onOpenChange={setShowPreview}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
+          {!loading && (
+            <DevisTemplate 
+              quote={quote} 
+              items={quoteItems} 
+              clientName={clientName}
+              paymentInfo={paymentInfo ? {
+                bankName: paymentInfo.bank_name,
+                iban: paymentInfo.iban,
+                bic: paymentInfo.bic
+              } : undefined}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
