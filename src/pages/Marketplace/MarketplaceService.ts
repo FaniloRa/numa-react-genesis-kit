@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Offer } from "@/types";
 import { mapOffers } from "@/utils/dataMapper";
@@ -51,19 +52,18 @@ export const fetchCategories = async () => {
 export const addToCart = async (offer: Offer, quantity: number = 1, userId: string) => {
   try {
     // Check if there's an existing cart (draft offer plate)
-    const { data: existingCart, error: cartError } = await supabase
+    const { data: existingCarts, error: cartError } = await supabase
       .from("offer_plates")
       .select("*")
       .eq("client_id", userId)
-      .eq("status", "draft")
-      .maybeSingle();
+      .eq("status", "draft");
     
     if (cartError) throw cartError;
     
     // Create a new cart if none exists
-    let cartId = existingCart?.id;
+    let cartId: string | undefined;
     
-    if (!cartId) {
+    if (!existingCarts || existingCarts.length === 0) {
       const { data: newCart, error: createError } = await supabase
         .from("offer_plates")
         .insert({
@@ -77,20 +77,23 @@ export const addToCart = async (offer: Offer, quantity: number = 1, userId: stri
       
       if (createError) throw createError;
       cartId = newCart.id;
+    } else {
+      // Use the first cart if multiple draft carts exist
+      cartId = existingCarts[0].id;
     }
     
     // Check if the offer already exists in the cart
-    const { data: existingItem, error: itemError } = await supabase
+    const { data: existingItems, error: itemError } = await supabase
       .from("offer_plate_items")
       .select("*")
       .eq("offer_plate_id", cartId)
-      .eq("offer_id", offer.id)
-      .maybeSingle();
+      .eq("offer_id", offer.id);
     
     if (itemError) throw itemError;
     
-    if (existingItem) {
+    if (existingItems && existingItems.length > 0) {
       // Update quantity if item exists
+      const existingItem = existingItems[0];
       const { error: updateError } = await supabase
         .from("offer_plate_items")
         .update({ quantity: existingItem.quantity + quantity })

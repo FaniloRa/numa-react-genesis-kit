@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/types";
 import { mapCartItems } from "@/utils/dataMapper";
@@ -5,15 +6,17 @@ import { mapCartItems } from "@/utils/dataMapper";
 export const fetchCartItems = async (userId: string) => {
   try {
     // First, find the user's cart (draft offer plate)
-    const { data: cart, error: cartError } = await supabase
+    const { data: carts, error: cartError } = await supabase
       .from("offer_plates")
       .select("*")
       .eq("client_id", userId)
-      .eq("status", "draft")
-      .maybeSingle();
+      .eq("status", "draft");
     
     if (cartError) throw cartError;
-    if (!cart) return [];
+    if (!carts || carts.length === 0) return [];
+    
+    // Use the first cart if multiple exist (this handles the case of multiple draft carts)
+    const cart = carts[0];
     
     // Then, get all items in that cart with their associated offers
     const { data: cartItems, error: itemsError } = await supabase
@@ -26,7 +29,9 @@ export const fetchCartItems = async (userId: string) => {
           id,
           name,
           description,
-          price,
+          price_monthly,
+          setup_fee,
+          is_active,
           category,
           image_url
         )
@@ -76,15 +81,17 @@ export const removeCartItem = async (itemId: string) => {
 export const createOfferPlate = async (userId: string, name: string = "Plaquette d'offres") => {
   try {
     // Find the user's cart
-    const { data: cart, error: cartError } = await supabase
+    const { data: carts, error: cartError } = await supabase
       .from("offer_plates")
       .select("*")
       .eq("client_id", userId)
-      .eq("status", "draft")
-      .maybeSingle();
+      .eq("status", "draft");
     
     if (cartError) throw cartError;
-    if (!cart) throw new Error("Votre panier est vide");
+    if (!carts || carts.length === 0) throw new Error("Votre panier est vide");
+    
+    // Use the first cart if multiple exist
+    const cart = carts[0];
     
     // Create a new offer plate with the cart items
     const { data: newOfferPlate, error: createError } = await supabase
