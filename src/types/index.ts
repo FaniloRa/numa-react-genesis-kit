@@ -1,64 +1,10 @@
-export enum UserRole {
-  CLIENT = 'client',
-  AGENT = 'agent',
-  ADMIN = 'admin'
-}
 
-export interface User {
+// Add to existing types file
+export interface PaymentInfo {
   id: string;
-  email: string;
-  firstName?: string;
-  lastName?: string;
-  phone?: string;
-  address?: string;
-  birthDate?: string;
-  role: UserRole;
-  createdAt: string;
-}
-
-export interface Offer {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  imageUrl?: string;
-  priceMonthly: number;
-  setupFee: number;
-  isActive: boolean;
-  createdAt: string;
-}
-
-export interface CartItem {
-  id?: string;
-  offerId: string;
-  offer: Offer;
-  quantity: number;
-}
-
-export interface OfferPlate {
-  id: string;
-  name: string;
-  clientId?: string;
-  agentId: string;
-  items: CartItem[];
-  status: 'draft' | 'sent' | 'accepted' | 'rejected';
-  createdAt: string;
-}
-
-export interface Quote {
-  id: string;
-  offerPlateId: string;
-  clientId?: string;
-  agentId: string;
-  totalAmount: number;
-  status: 'pending' | 'approved' | 'sent' | 'accepted' | 'rejected';
-  createdAt: string;
-}
-
-export interface Folder {
-  id: string;
-  name: string;
-  clientId: string;
-  agentId: string;
+  quoteId: string;
+  bankName: string;
+  iban: string;
+  bic: string;
   createdAt: string;
 }

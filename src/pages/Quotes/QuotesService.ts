@@ -173,3 +173,45 @@ export const fetchOfferPlatesWithoutQuotes = async (userId: string, isAgent: boo
     throw error;
   }
 };
+
+export const createPaymentInfo = async (paymentData: {
+  quoteId: string;
+  bankName: string;
+  iban: string;
+  bic: string;
+}) => {
+  try {
+    const { data, error } = await supabase
+      .from("payment_info")
+      .insert({
+        quote_id: paymentData.quoteId,
+        bank_name: paymentData.bankName,
+        iban: paymentData.iban,
+        bic: paymentData.bic,
+      })
+      .select()
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating payment info:", error);
+    throw error;
+  }
+};
+
+export const fetchPaymentInfoByQuoteId = async (quoteId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("payment_info")
+      .select("*")
+      .eq("quote_id", quoteId)
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching payment info:", error);
+    throw error;
+  }
+};

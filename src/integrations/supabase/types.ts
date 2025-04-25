@@ -144,6 +144,44 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_info: {
+        Row: {
+          bank_name: string
+          bic: string
+          created_at: string
+          iban: string
+          id: string
+          quote_id: string
+          updated_at: string
+        }
+        Insert: {
+          bank_name: string
+          bic: string
+          created_at?: string
+          iban: string
+          id?: string
+          quote_id: string
+          updated_at?: string
+        }
+        Update: {
+          bank_name?: string
+          bic?: string
+          created_at?: string
+          iban?: string
+          id?: string
+          quote_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_info_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: false
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           address: string | null
