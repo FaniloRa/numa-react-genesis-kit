@@ -16,6 +16,7 @@ export type Database = {
           created_at: string | null
           id: string
           name: string
+          quote_id: string | null
           updated_at: string | null
         }
         Insert: {
@@ -24,6 +25,7 @@ export type Database = {
           created_at?: string | null
           id?: string
           name: string
+          quote_id?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -32,9 +34,18 @@ export type Database = {
           created_at?: string | null
           id?: string
           name?: string
+          quote_id?: string | null
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "folders_quote_id_fkey"
+            columns: ["quote_id"]
+            isOneToOne: true
+            referencedRelation: "quotes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       offer_plate_items: {
         Row: {
@@ -80,8 +91,11 @@ export type Database = {
           agent_id: string
           client_id: string | null
           created_at: string | null
+          folder_id: string | null
           id: string
           name: string
+          sent_at: string | null
+          sent_method: string | null
           status: string
           updated_at: string | null
         }
@@ -89,8 +103,11 @@ export type Database = {
           agent_id: string
           client_id?: string | null
           created_at?: string | null
+          folder_id?: string | null
           id?: string
           name: string
+          sent_at?: string | null
+          sent_method?: string | null
           status?: string
           updated_at?: string | null
         }
@@ -98,12 +115,23 @@ export type Database = {
           agent_id?: string
           client_id?: string | null
           created_at?: string | null
+          folder_id?: string | null
           id?: string
           name?: string
+          sent_at?: string | null
+          sent_method?: string | null
           status?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "offer_plates_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       offers: {
         Row: {
