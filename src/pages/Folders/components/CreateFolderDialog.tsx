@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import {
   Dialog,
@@ -29,8 +28,9 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
-import { createFolder, fetchClientProfiles } from "../FoldersService";
+import { createFolder } from "../FoldersService";
 import { useAuth } from "@/lib/auth";
+import { fetchClientProfiles } from "@/pages/Marketplace/MarketplacePlateService";
 
 interface CreateFolderDialogProps {
   open: boolean;
@@ -83,6 +83,7 @@ const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
 
   useEffect(() => {
     if (open) {
+      form.reset();
       loadClients();
     }
   }, [open]);
@@ -97,7 +98,6 @@ const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
         title: "Dossier créé",
         description: "Le dossier a été créé avec succès.",
       });
-      form.reset();
       onSuccess();
       onClose();
     } catch (error: any) {
@@ -156,7 +156,7 @@ const CreateFolderDialog: React.FC<CreateFolderDialogProps> = ({
                     <SelectContent>
                       {clients.map((client) => (
                         <SelectItem key={client.id} value={client.id}>
-                          {client.first_name} {client.last_name}
+                          {`${client.firstName} ${client.lastName}`}
                         </SelectItem>
                       ))}
                     </SelectContent>
