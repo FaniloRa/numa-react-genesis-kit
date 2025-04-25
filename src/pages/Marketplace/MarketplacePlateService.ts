@@ -69,11 +69,11 @@ export const createOfferPlate = async (
 
 export const fetchClientProfiles = async (): Promise<User[]> => {
   try {
+    // Corrected query: The profiles table doesn't have an 'email' column
     const { data, error } = await supabase
       .from('profiles')
       .select(`
         id,
-        email,
         first_name,
         last_name,
         role,
@@ -83,9 +83,10 @@ export const fetchClientProfiles = async (): Promise<User[]> => {
     
     if (error) throw error;
     
+    // Generate a placeholder email since email is not in the profiles table
     return data.map(profile => ({
       id: profile.id,
-      email: profile.email || '',
+      email: `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`, // Placeholder email
       firstName: profile.first_name || '',
       lastName: profile.last_name || '',
       role: UserRole.CLIENT,
