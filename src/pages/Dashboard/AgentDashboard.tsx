@@ -46,9 +46,9 @@ const AgentDashboard: React.FC = () => {
         { count: foldersCount },
         { count: quotesCount },
         { count: clientsCount },
-        { data: pendingQuotes },
-        { data: recentFolders },
-        { data: recentQuotes }
+        { data: pendingQuotesData },
+        { data: recentFoldersData },
+        { data: recentQuotesData }
       ] = await Promise.all([
         supabase
           .from("folders")
@@ -70,7 +70,7 @@ const AgentDashboard: React.FC = () => {
             status,
             created_at,
             client_id,
-            profiles!quotes_client_id_fkey (
+            profiles(
               first_name,
               last_name
             )
@@ -81,7 +81,13 @@ const AgentDashboard: React.FC = () => {
           .limit(5),
         supabase
           .from("folders")
-          .select("*, profiles!folders_client_id_fkey (first_name, last_name)")
+          .select(`
+            *,
+            profiles(
+              first_name, 
+              last_name
+            )
+          `)
           .eq("agent_id", auth.user.id)
           .order("created_at", { ascending: false })
           .limit(5),
@@ -93,7 +99,7 @@ const AgentDashboard: React.FC = () => {
             status,
             created_at,
             client_id,
-            profiles!quotes_client_id_fkey (
+            profiles(
               first_name,
               last_name
             )
@@ -126,20 +132,29 @@ const AgentDashboard: React.FC = () => {
       ]);
       
       // Set pending quotes
-      setPendingQuotes(pendingQuotes || []);
+      setPendingQuotes(pendingQuotesData?.map(quote => {
+        return {
+          ...quote,
+          profiles: quote.profiles || { first_name: "Client", last_name: "" }
+        };
+      }) || []);
       
-      // Transform recent activity
-      const folderActivities = (recentFolders || []).map(folder => ({
+      // Transform recent activity, safely handling potentially missing data
+      const folderActivities = (recentFoldersData || []).map(folder => ({
         id: folder.id,
         type: "folder",
-        name: `Dossier: ${folder.name} - ${folder.profiles.first_name} ${folder.profiles.last_name}`,
+        name: `Dossier: ${folder.name} - ${
+          folder.profiles?.first_name || "Client"} ${folder.profiles?.last_name || ""
+        }`,
         date: folder.created_at,
       }));
       
-      const quoteActivities = (recentQuotes || []).map(quote => ({
+      const quoteActivities = (recentQuotesData || []).map(quote => ({
         id: quote.id,
         type: "quote",
-        name: `Devis #${quote.id.substring(0, 8)} - ${quote.profiles?.first_name || "Client"} ${quote.profiles?.last_name || ""}`,
+        name: `Devis #${quote.id.substring(0, 8)} - ${
+          quote.profiles?.first_name || "Client"} ${quote.profiles?.last_name || ""
+        }`,
         date: quote.created_at,
         status: quote.status,
       }));

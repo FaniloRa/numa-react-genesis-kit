@@ -5,6 +5,7 @@ import { Users, FileText, FolderOpen, Check, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { UserRole } from "@/types";
+import { Button } from "@/components/ui/button";
 
 interface DashboardStat {
   title: string;
@@ -37,8 +38,8 @@ const AdminDashboard: React.FC = () => {
         { count: usersCount },
         { count: quotesCount },
         { count: foldersCount },
-        { data: pendingQuotes },
-        { data: recentActivity }
+        { data: pendingQuotesData },
+        { data: recentActivityData }
       ] = await Promise.all([
         supabase.from("profiles").select("*", { count: "exact" }),
         supabase.from("quotes").select("*", { count: "exact" }),
@@ -50,7 +51,7 @@ const AdminDashboard: React.FC = () => {
             status,
             created_at,
             agent_id,
-            profiles!quotes_agent_id_fkey (
+            profiles(
               first_name,
               last_name
             )
@@ -65,7 +66,7 @@ const AdminDashboard: React.FC = () => {
             status,
             created_at,
             agent_id,
-            profiles!quotes_agent_id_fkey (
+            profiles(
               first_name,
               last_name
             )
@@ -96,14 +97,21 @@ const AdminDashboard: React.FC = () => {
         },
       ]);
       
-      // Set pending quotes
-      setPendingQuotes(pendingQuotes || []);
+      // Set pending quotes, handling potential null values or missing relations
+      setPendingQuotes(pendingQuotesData?.map(quote => {
+        return {
+          ...quote,
+          profiles: quote.profiles || { first_name: "Agent", last_name: "Inconnu" }
+        };
+      }) || []);
       
-      // Transform recent activity
-      const activities = (recentActivity || []).map(item => ({
+      // Transform recent activity, handling potential null values or missing relations
+      const activities = (recentActivityData || []).map(item => ({
         id: item.id,
         type: "quote",
-        name: `Devis #${item.id.substring(0, 8)} - ${item.profiles.first_name} ${item.profiles.last_name}`,
+        name: `Devis #${item.id.substring(0, 8)} - ${
+          item.profiles?.first_name || "Agent"} ${item.profiles?.last_name || "Inconnu"
+        }`,
         date: item.created_at,
         status: item.status,
       }));
@@ -319,5 +327,4 @@ const AdminDashboard: React.FC = () => {
   );
 };
 
-import { Button } from "@/components/ui/button";
 export default AdminDashboard;
