@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { CartItem, Offer } from "@/types";
+import { CartItem } from "@/types";
+import { mapCartItems } from "@/utils/dataMapper";
 
 export const fetchCartItems = async (userId: string) => {
   try {
@@ -35,13 +35,8 @@ export const fetchCartItems = async (userId: string) => {
     
     if (itemsError) throw itemsError;
     
-    // Transform the data to match our CartItem type
-    return cartItems.map((item: any) => ({
-      offerId: item.offer_id,
-      offer: item.offers as Offer,
-      quantity: item.quantity,
-      id: item.id
-    })) as CartItem[];
+    // Use the mapper to transform the data
+    return mapCartItems(cartItems);
   } catch (error) {
     console.error("Error fetching cart items:", error);
     throw error;

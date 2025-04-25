@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -234,7 +235,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                   </TableHeader>
                   <TableBody>
                     {quoteItems.map((item) => (
-                      <TableRow key={item.id}>
+                      <TableRow key={`${item.offerId}-${item.quantity}`}>
                         <TableCell className="font-medium">{item.offer.name}</TableCell>
                         <TableCell className="max-w-xs truncate">{item.offer.description}</TableCell>
                         <TableCell className="text-right">{Number(item.offer.price).toFixed(2)} €</TableCell>

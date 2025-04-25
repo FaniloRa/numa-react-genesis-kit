@@ -1,6 +1,7 @@
 
 import { supabase } from "@/integrations/supabase/client";
 import { Folder, OfferPlate, Quote } from "@/types";
+import { mapFolders, mapFolder, mapOfferPlates, mapQuotes } from "@/utils/dataMapper";
 
 export const fetchFolders = async (userId: string, isAgent: boolean) => {
   try {
@@ -22,7 +23,7 @@ export const fetchFolders = async (userId: string, isAgent: boolean) => {
     const { data, error } = await query.order("created_at", { ascending: false });
     
     if (error) throw error;
-    return data as Folder[];
+    return mapFolders(data);
   } catch (error) {
     console.error("Error fetching folders:", error);
     throw error;
@@ -57,7 +58,7 @@ export const fetchOfferPlatesForFolder = async (folderId: string) => {
       .order("created_at", { ascending: false });
     
     if (error) throw error;
-    return data as OfferPlate[];
+    return mapOfferPlates(data);
   } catch (error) {
     console.error("Error fetching offer plates:", error);
     throw error;
@@ -92,7 +93,7 @@ export const fetchQuotesForFolder = async (folderId: string) => {
       .order("created_at", { ascending: false });
     
     if (error) throw error;
-    return data as Quote[];
+    return mapQuotes(data);
   } catch (error) {
     console.error("Error fetching quotes:", error);
     throw error;
@@ -112,7 +113,7 @@ export const createFolder = async (name: string, clientId: string, agentId: stri
       .single();
     
     if (error) throw error;
-    return data as Folder;
+    return mapFolder(data);
   } catch (error) {
     console.error("Error creating folder:", error);
     throw error;

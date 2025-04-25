@@ -23,11 +23,12 @@ export interface Offer {
   description: string;
   price: number;
   category: string;
-  imageUrl?: string;
+  imageUrl?: string;  // This matches what TypeScript expects
   createdAt: string;
 }
 
 export interface CartItem {
+  id?: string;  // Add id property
   offerId: string;
   offer: Offer;
   quantity: number;

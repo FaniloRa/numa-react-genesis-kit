@@ -67,10 +67,10 @@ const OfferDetailDialog: React.FC<OfferDetailDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        {offer.image_url && (
+        {offer.imageUrl && (
           <div className="w-full h-48 bg-muted rounded-md overflow-hidden">
             <img 
-              src={offer.image_url} 
+              src={offer.imageUrl} 
               alt={offer.name} 
               className="w-full h-full object-cover"
             />

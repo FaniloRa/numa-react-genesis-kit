@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, OfferPlate, CartItem } from "@/types";
+import { mapQuotes, mapQuote, mapCartItems, mapOfferPlates } from "@/utils/dataMapper";
 
 export const fetchQuotes = async (userId: string, isAgent: boolean, isAdmin: boolean) => {
   try {
@@ -25,7 +25,7 @@ export const fetchQuotes = async (userId: string, isAgent: boolean, isAdmin: boo
     const { data, error } = await query.order("created_at", { ascending: false });
     
     if (error) throw error;
-    return data as Quote[];
+    return mapQuotes(data);
   } catch (error) {
     console.error("Error fetching quotes:", error);
     throw error;
@@ -53,7 +53,13 @@ export const fetchQuoteDetails = async (quoteId: string) => {
       .single();
     
     if (error) throw error;
-    return data as Quote & { offer_plates: OfferPlate };
+    
+    // Create a mapped quote with the mapped offer_plates
+    const mappedQuote = mapQuote(data);
+    return {
+      ...mappedQuote,
+      offer_plates: data.offer_plates // Keep original structure for this nested object
+    };
   } catch (error) {
     console.error("Error fetching quote details:", error);
     throw error;
@@ -81,12 +87,7 @@ export const fetchQuoteItems = async (offerPlateId: string) => {
     
     if (error) throw error;
     
-    return data.map((item: any) => ({
-      offerId: item.offer_id,
-      offer: item.offers,
-      quantity: item.quantity,
-      id: item.id
-    })) as CartItem[];
+    return mapCartItems(data);
   } catch (error) {
     console.error("Error fetching quote items:", error);
     throw error;
@@ -107,7 +108,7 @@ export const createQuote = async (offerPlateId: string, totalAmount: number, cli
       .single();
     
     if (error) throw error;
-    return data as Quote;
+    return mapQuote(data);
   } catch (error) {
     console.error("Error creating quote:", error);
     throw error;
@@ -166,7 +167,7 @@ export const fetchOfferPlatesWithoutQuotes = async (userId: string, isAgent: boo
       (plate: any) => !offerPlateIdsWithQuotes.includes(plate.id)
     );
     
-    return platesWithoutQuotes as OfferPlate[];
+    return mapOfferPlates(platesWithoutQuotes);
   } catch (error) {
     console.error("Error fetching offer plates without quotes:", error);
     throw error;

@@ -1,6 +1,6 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Offer } from "@/types";
+import { mapOffers } from "@/utils/dataMapper";
 
 export const fetchOffers = async (searchTerm?: string, category?: string) => {
   try {
@@ -20,7 +20,8 @@ export const fetchOffers = async (searchTerm?: string, category?: string) => {
       throw error;
     }
 
-    return data as Offer[];
+    // Use mapper to convert snake_case to camelCase
+    return mapOffers(data);
   } catch (error) {
     console.error("Error fetching offers:", error);
     throw error;

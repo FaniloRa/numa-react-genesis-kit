@@ -27,11 +27,11 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
   };
 
   const handleUpdateQuantity = async () => {
-    if (quantity === item.quantity || quantity <= 0) return;
+    if (quantity === item.quantity || quantity <= 0 || !item.id) return;
     
     try {
       setIsUpdating(true);
-      await updateCartItemQuantity(item.id!, quantity);
+      await updateCartItemQuantity(item.id, quantity);
       toast({
         title: "Quantité mise à jour",
         description: `La quantité de ${item.offer.name} a été mise à jour.`,
@@ -49,9 +49,11 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
   };
 
   const handleRemoveItem = async () => {
+    if (!item.id) return;
+    
     try {
       setIsRemoving(true);
-      await removeCartItem(item.id!);
+      await removeCartItem(item.id);
       toast({
         title: "Article supprimé",
         description: `${item.offer.name} a été supprimé du panier.`,
@@ -86,7 +88,7 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
           <Button 
             variant="ghost" 
             size="icon" 
-            onClick={handleQuantityChange}
+            onClick={() => handleUpdateQuantity()}
             disabled={quantity === item.quantity || isUpdating}
           >
             ✓

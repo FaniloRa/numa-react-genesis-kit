@@ -67,7 +67,7 @@ const CartPage: React.FC = () => {
               <TableBody>
                 {cartItems.map((item) => (
                   <CartItemRow 
-                    key={item.id} 
+                    key={item.id || `${item.offerId}-${item.quantity}`} 
                     item={item} 
                     onUpdate={loadCartItems} 
                   />

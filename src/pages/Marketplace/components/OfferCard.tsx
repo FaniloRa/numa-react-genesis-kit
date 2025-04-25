@@ -47,8 +47,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
       <div 
         className="h-40 bg-muted"
         style={
-          offer.image_url 
-            ? { backgroundImage: `url(${offer.image_url})`, backgroundSize: 'cover', backgroundPosition: 'center' } 
+          offer.imageUrl 
+            ? { backgroundImage: `url(${offer.imageUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' } 
             : {}
         }
       />
