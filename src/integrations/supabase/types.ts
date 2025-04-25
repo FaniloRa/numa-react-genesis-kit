@@ -9,7 +9,212 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      folders: {
+        Row: {
+          agent_id: string
+          client_id: string
+          created_at: string | null
+          id: string
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          client_id: string
+          created_at?: string | null
+          id?: string
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          client_id?: string
+          created_at?: string | null
+          id?: string
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      offer_plate_items: {
+        Row: {
+          created_at: string | null
+          id: string
+          offer_id: string
+          offer_plate_id: string
+          quantity: number
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          offer_id: string
+          offer_plate_id: string
+          quantity?: number
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          offer_id?: string
+          offer_plate_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_plate_items_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "offer_plate_items_offer_plate_id_fkey"
+            columns: ["offer_plate_id"]
+            isOneToOne: false
+            referencedRelation: "offer_plates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      offer_plates: {
+        Row: {
+          agent_id: string
+          client_id: string | null
+          created_at: string | null
+          id: string
+          name: string
+          status: string
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          name: string
+          status?: string
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          name?: string
+          status?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      offers: {
+        Row: {
+          category: string
+          created_at: string | null
+          description: string
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          updated_at: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string | null
+          description: string
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          updated_at?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string | null
+          description?: string
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          address: string | null
+          birth_date: string | null
+          created_at: string | null
+          first_name: string | null
+          id: string
+          last_name: string | null
+          phone: string | null
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id: string
+          last_name?: string | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          birth_date?: string | null
+          created_at?: string | null
+          first_name?: string | null
+          id?: string
+          last_name?: string | null
+          phone?: string | null
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      quotes: {
+        Row: {
+          agent_id: string
+          client_id: string | null
+          created_at: string | null
+          id: string
+          offer_plate_id: string
+          status: string
+          total_amount: number
+          updated_at: string | null
+        }
+        Insert: {
+          agent_id: string
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          offer_plate_id: string
+          status?: string
+          total_amount: number
+          updated_at?: string | null
+        }
+        Update: {
+          agent_id?: string
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          offer_plate_id?: string
+          status?: string
+          total_amount?: number
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_offer_plate_id_fkey"
+            columns: ["offer_plate_id"]
+            isOneToOne: false
+            referencedRelation: "offer_plates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -18,7 +223,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "client" | "agent" | "admin"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -133,6 +338,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["client", "agent", "admin"],
+    },
   },
 } as const

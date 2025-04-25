@@ -149,7 +149,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           data: {
             first_name: firstName,
             last_name: lastName,
-            role,
+            phone: phone,
+            address: address,
+            birth_date: birthDate,
+            role: role,
           },
         },
       });
