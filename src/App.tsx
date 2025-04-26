@@ -2,7 +2,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/components/AuthProvider';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { ProtectedRoute } from '@/components/ProtectedRoute';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import { Toaster } from '@/components/ui/toaster';
 
 import Index from '@/pages/Index';
@@ -14,7 +14,7 @@ import Marketplace from '@/pages/Marketplace';
 import Clients from '@/pages/Clients';
 import Folders from '@/pages/Folders';
 import Quotes from '@/pages/Quotes';
-import QuoteDetailView from '@/pages/Quotes/components/QuoteDetailView';
+import QuoteDetailPage from '@/pages/Quotes/components/QuoteDetailPage';
 import CartPage from '@/pages/Cart';
 import OfferPlateDetailPage from '@/pages/OfferPlates/OfferPlateDetailPage';
 
@@ -83,7 +83,7 @@ function App() {
             element={
               <ProtectedRoute>
                 <MainLayout>
-                  <QuoteDetailView />
+                  <QuoteDetailPage />
                 </MainLayout>
               </ProtectedRoute>
             }
