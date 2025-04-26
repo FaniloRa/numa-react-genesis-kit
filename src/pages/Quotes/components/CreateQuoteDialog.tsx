@@ -126,7 +126,7 @@ const CreateQuoteDialog: React.FC<CreateQuoteDialogProps> = ({
       
       await createQuote(
         data.offerPlateId,
-        parseFloat(data.totalAmount),
+        Number(data.totalAmount),
         selectedOfferPlate.clientId || auth.user.id,
         isAgent ? auth.user.id : selectedOfferPlate.agentId
       );

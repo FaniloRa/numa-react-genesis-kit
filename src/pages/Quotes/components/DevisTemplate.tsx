@@ -53,7 +53,7 @@ const DevisTemplate: React.FC<DevisTemplateProps> = ({ quote, items, clientName,
 
           {/* Client Info Section */}
           <div className="mb-6">
-            <div className="flex flex-col text-left">
+            <div className="flex flex-col">
               <h2 className="font-bold text-base">Client: {clientName || "Client"}</h2>
               <p className="uppercase text-xs text-gray-700">{quote.clientId ? quote.clientId : ""}</p>
               <p className="text-xs text-blue-600">{quote.client?.email || ""}</p>
@@ -111,7 +111,7 @@ const DevisTemplate: React.FC<DevisTemplateProps> = ({ quote, items, clientName,
 
           {/* Payment Info and Signature Section */}
           <div className="flex justify-between">
-            <div className="w-1/2 text-left">
+            <div className="w-1/2">
               <div className="mb-6">
                 <h3 className="text-sm font-bold text-[#2B3266] mb-1">Informations de paiement</h3>
                 <p className="text-xs">Paiement par virement bancaire</p>
