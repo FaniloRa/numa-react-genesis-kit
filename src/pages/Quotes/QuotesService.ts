@@ -1,6 +1,6 @@
 
 import { supabase } from "@/integrations/supabase/client";
-import { CartItem, Quote, OfferPlate } from "@/types";
+import { CartItem, Quote, OfferPlate, PaymentInfo } from "@/types";
 import { mapQuotes, mapQuote, mapCartItems, mapOfferPlates } from "@/utils/dataMapper";
 
 // Function to fetch all quotes
@@ -139,8 +139,40 @@ export const fetchPaymentInfoByQuoteId = async (quoteId: string) => {
   }
 };
 
+// Function to create payment information for a quote
+export const createPaymentInfo = async (paymentInfo: {
+  quoteId: string;
+  bankName: string;
+  iban: string;
+  bic: string;
+}) => {
+  try {
+    const { data, error } = await supabase
+      .from("payment_info")
+      .insert({
+        quote_id: paymentInfo.quoteId,
+        bank_name: paymentInfo.bankName,
+        iban: paymentInfo.iban,
+        bic: paymentInfo.bic
+      })
+      .select()
+      .single();
+
+    if (error) throw new Error(error.message);
+    return data;
+  } catch (error: any) {
+    console.error("Error creating payment info:", error);
+    throw new Error(error.message || "Failed to create payment information");
+  }
+};
+
 // Function to create a new quote
-export const createQuote = async (agentId: string, offerPlateId: string, clientId: string, totalAmount: number) => {
+export const createQuote = async (
+  offerPlateId: string,
+  totalAmount: number,
+  clientId: string,
+  agentId: string
+) => {
   try {
     const { data, error } = await supabase
       .from("quotes")
@@ -159,6 +191,33 @@ export const createQuote = async (agentId: string, offerPlateId: string, clientI
   } catch (error: any) {
     console.error("Error creating quote:", error);
     throw new Error(error.message || "Failed to create quote");
+  }
+};
+
+// Function to fetch offer plates that don't have quotes yet
+export const fetchOfferPlatesWithoutQuotes = async (userId: string, isAgent: boolean) => {
+  try {
+    let query = supabase
+      .from("offer_plates")
+      .select(`
+        *,
+        client:client_id (first_name, last_name)
+      `);
+    
+    if (isAgent) {
+      query = query.eq("agent_id", userId);
+    } else {
+      query = query.eq("client_id", userId);
+    }
+    
+    const { data, error } = await query.order("created_at", { ascending: false });
+
+    if (error) throw new Error(error.message);
+    
+    return mapOfferPlates(data || []);
+  } catch (error: any) {
+    console.error("Error fetching offer plates:", error);
+    throw new Error(error.message || "Failed to load offer plates");
   }
 };
 
