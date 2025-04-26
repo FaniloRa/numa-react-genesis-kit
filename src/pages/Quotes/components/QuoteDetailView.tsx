@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -197,9 +196,14 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     return null;
   };
 
-  const totalAmount = quoteDetails?.total_amount || 0;
-  const clientName = quoteDetails?.client_id ? 
-    `${quoteDetails?.client?.first_name || ""} ${quoteDetails?.client?.last_name || ""}` : 
+  const totalAmount = quoteItems.reduce((acc, item) => {
+    const monthlyTotal = item.offer.priceMonthly * item.quantity;
+    const setupTotal = item.offer.setupFee * item.quantity;
+    return acc + monthlyTotal + setupTotal;
+  }, 0);
+
+  const clientName = quoteDetails?.client ? 
+    `${quoteDetails.client.first_name || ""} ${quoteDetails.client.last_name || ""}`.trim() : 
     "Client";
 
   return (
@@ -233,6 +237,10 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
           ) : (
             <div className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <h3 className="text-sm font-medium text-muted-foreground">Client</h3>
+                  <p>{clientName}</p>
+                </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Plaquette d'offres</h3>
                   <p>{quoteDetails?.offer_plates?.name || "N/A"}</p>
@@ -286,20 +294,52 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
           )}
         </CardContent>
       </Card>
+
+      {!loading && quote.status === 'draft' && !isClient && !isAdmin && (
+        <div className="mt-8 flex justify-center">
+          <Button 
+            onClick={() => handleStatusUpdate('pending')}
+            disabled={processingAction}
+            size="lg"
+            className="w-full max-w-md"
+          >
+            <SendToBack className="h-4 w-4 mr-2" />
+            Envoyer à l'administrateur pour validation
+          </Button>
+        </div>
+      )}
       
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
           {!loading && (
-            <DevisTemplate 
-              quote={quote} 
-              items={quoteItems} 
-              clientName={clientName}
-              paymentInfo={paymentInfo ? {
-                bankName: paymentInfo.bank_name,
-                iban: paymentInfo.iban,
-                bic: paymentInfo.bic
-              } : undefined}
-            />
+            <>
+              <DevisTemplate 
+                quote={quote} 
+                items={quoteItems} 
+                clientName={clientName}
+                paymentInfo={paymentInfo ? {
+                  bankName: paymentInfo.bank_name,
+                  iban: paymentInfo.iban,
+                  bic: paymentInfo.bic
+                } : undefined}
+              />
+              {quote.status === 'draft' && !isClient && !isAdmin && (
+                <div className="mt-6 flex justify-center">
+                  <Button 
+                    onClick={() => {
+                      setShowPreview(false);
+                      handleStatusUpdate('pending');
+                    }}
+                    disabled={processingAction}
+                    size="lg"
+                    className="w-full max-w-md"
+                  >
+                    <SendToBack className="h-4 w-4 mr-2" />
+                    Envoyer à l'administrateur pour validation
+                  </Button>
+                </div>
+              )}
+            </>
           )}
         </DialogContent>
       </Dialog>
