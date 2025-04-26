@@ -38,7 +38,7 @@ interface CreateOfferPlateDialogProps {
   userId: string;
   open: boolean;
   onClose: () => void;
-  onSuccess: () => void;
+  onSuccess: (offerPlateId: string) => void;
 }
 
 const formSchema = z.object({
@@ -97,12 +97,12 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
-      await createOfferPlate(userId, data.name, data.folderId);
+      const offerPlate = await createOfferPlate(userId, data.name, data.folderId);
       toast({
         title: "Plaquette créée",
         description: "Votre plaquette d'offres a été créée avec succès.",
       });
-      onSuccess();
+      onSuccess(offerPlate.id);
       onClose();
     } catch (error: any) {
       toast({
