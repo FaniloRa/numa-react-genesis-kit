@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -207,7 +208,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     "Client";
 
   return (
-    <div>
+    <div className="text-left">
       <div className="flex items-center mb-4">
         <Button variant="ghost" onClick={onBack} className="mr-2">
           <ArrowLeft className="h-4 w-4 mr-2" />
@@ -301,7 +302,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
             onClick={() => handleStatusUpdate('pending')}
             disabled={processingAction}
             size="lg"
-            className="w-full max-w-md"
+            className="w-full max-w-md bg-primary hover:bg-primary/90"
           >
             <SendToBack className="h-4 w-4 mr-2" />
             Envoyer à l'administrateur pour validation
@@ -310,7 +311,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
       )}
       
       <Dialog open={showPreview} onOpenChange={setShowPreview}>
-        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto">
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-auto text-left">
           {!loading && (
             <>
               <DevisTemplate 
@@ -332,7 +333,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                     }}
                     disabled={processingAction}
                     size="lg"
-                    className="w-full max-w-md"
+                    className="w-full max-w-md bg-primary hover:bg-primary/90"
                   >
                     <SendToBack className="h-4 w-4 mr-2" />
                     Envoyer à l'administrateur pour validation

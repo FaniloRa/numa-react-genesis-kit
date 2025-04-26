@@ -15,7 +15,8 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger
+  SidebarTrigger,
+  useSidebar
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
@@ -27,12 +28,14 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
-import { useToast } from "@/components/ui/use-toast";
+import { useToast } from "@/components/ui/toast";
 
 export const AppSidebar: React.FC = () => {
   const { auth, hasRole, signOut } = useAuth();
   const location = useLocation();
   const { toast } = useToast();
+  const { state } = useSidebar();
+  const isCollapsed = state === "collapsed";
 
   const handleLogout = async () => {
     await signOut();
@@ -95,11 +98,11 @@ export const AppSidebar: React.FC = () => {
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
-          <h1 className="text-2xl font-bold text-vivid-purple">i-numa</h1>
+          <h1 className={cn("text-2xl font-bold text-vivid-purple", isCollapsed && "hidden")}>i-numa</h1>
           <SidebarTrigger />
         </div>
         {auth.user && (
-          <div className="mt-4 text-sm">
+          <div className={cn("mt-4 text-sm", isCollapsed && "hidden")}>
             <p className="font-medium">{auth.user.firstName} {auth.user.lastName}</p>
             <p className="text-xs text-muted-foreground capitalize">{auth.user.role}</p>
           </div>
