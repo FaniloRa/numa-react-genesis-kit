@@ -1,6 +1,7 @@
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, CartItem } from "@/types";
 import { createNotification } from "@/services/NotificationService";
+import { mapQuote, mapQuotes, mapCartItems, mapOfferPlates } from "@/utils/dataMapper";
 
 export const fetchQuoteById = async (quoteId: string) => {
   try {
@@ -20,15 +21,7 @@ export const fetchQuoteById = async (quoteId: string) => {
     
     if (error) throw error;
     
-    return {
-      id: data.id,
-      offerPlateId: data.offer_plate_id,
-      agentId: data.agent_id,
-      clientId: data.client_id,
-      status: data.status,
-      totalAmount: data.total_amount,
-      createdAt: data.created_at
-    };
+    return mapQuote(data);
   } catch (error) {
     console.error("Error fetching quote:", error);
     throw error;

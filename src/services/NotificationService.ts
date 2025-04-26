@@ -31,7 +31,7 @@ export const fetchNotifications = async (userId: string): Promise<Notification[]
       userId: notification.user_id,
       title: notification.title,
       content: notification.content,
-      type: notification.type,
+      type: notification.type as "info" | "success" | "warning" | "error",
       read: notification.read,
       createdAt: notification.created_at,
       link: notification.link
@@ -103,7 +103,7 @@ export const createNotification = async (
       userId: data.user_id,
       title: data.title,
       content: data.content,
-      type: data.type,
+      type: data.type as "info" | "success" | "warning" | "error",
       read: data.read,
       createdAt: data.created_at,
       link: data.link
