@@ -13,7 +13,7 @@ interface MainLayoutProps {
 export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <SidebarProvider>
-      <div className="min-h-screen flex w-full flex-col">
+      <div className="min-h-screen flex w-full flex-col text-left">
         <TopBar />
         <div className="flex flex-1">
           <AppSidebar />

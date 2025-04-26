@@ -1,11 +1,11 @@
 
-import React from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Folder, UserRole } from "@/types";
+import { format } from "date-fns";
 import { FolderOpen } from "lucide-react";
-import { Folder } from "@/types";
-import { formatDistanceToNow } from "date-fns";
-import { fr } from "date-fns/locale";
+import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FolderCardProps {
   folder: Folder;
@@ -13,22 +13,82 @@ interface FolderCardProps {
 }
 
 const FolderCard: React.FC<FolderCardProps> = ({ folder, onSelect }) => {
+  const { auth, hasRole } = useAuth();
+  const isAdmin = hasRole(UserRole.ADMIN);
+  const isAgent = hasRole(UserRole.AGENT) && !isAdmin;
+  
+  const [clientName, setClientName] = useState<string>("");
+  const [agentName, setAgentName] = useState<string>("");
+  
+  const formattedDate = folder.createdAt ? format(new Date(folder.createdAt), 'dd/MM/yyyy') : '';
+
+  useEffect(() => {
+    if ((isAdmin || isAgent) && folder.clientId) {
+      fetchUserName(folder.clientId, "client");
+    }
+    
+    if (isAdmin && folder.agentId) {
+      fetchUserName(folder.agentId, "agent");
+    }
+  }, [folder, isAdmin, isAgent]);
+  
+  const fetchUserName = async (userId: string, userType: "client" | "agent") => {
+    try {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("first_name, last_name")
+        .eq("id", userId)
+        .single();
+      
+      if (error) throw error;
+      
+      const fullName = `${data.first_name || ""} ${data.last_name || ""}`.trim();
+      if (userType === "client") {
+        setClientName(fullName || "Client");
+      } else {
+        setAgentName(fullName || "Agent");
+      }
+    } catch (error) {
+      console.error(`Error fetching ${userType} name:`, error);
+      if (userType === "client") {
+        setClientName("Client");
+      } else {
+        setAgentName("Agent");
+      }
+    }
+  };
+  
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => onSelect(folder)}>
-      <CardHeader className="pb-2">
-        <div className="flex justify-between items-start">
-          <CardTitle className="text-lg">{folder.name}</CardTitle>
-          <FolderOpen className="h-5 w-5 text-muted-foreground" />
+    <Card 
+      className="cursor-pointer hover:border-blue-300 transition-colors"
+      onClick={() => onSelect(folder)}
+    >
+      <CardContent className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex items-center">
+            <div className="bg-blue-100 p-2 rounded-full mr-3">
+              <FolderOpen className="text-blue-500 h-5 w-5" />
+            </div>
+            <div>
+              <h3 className="font-semibold text-lg">{folder.name}</h3>
+              <p className="text-sm text-muted-foreground">Créé le {formattedDate}</p>
+              
+              {/* Show client name for admin and agents */}
+              {(isAdmin || isAgent) && clientName && (
+                <p className="text-sm text-muted-foreground mt-1">
+                  <span className="font-medium">Client:</span> {clientName}
+                </p>
+              )}
+              
+              {/* Show agent name for admin */}
+              {isAdmin && agentName && (
+                <p className="text-sm text-muted-foreground">
+                  <span className="font-medium">Agent:</span> {agentName}
+                </p>
+              )}
+            </div>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent>
-        <p className="text-xs text-muted-foreground mb-3">
-          Créé {formatDistanceToNow(new Date(folder.createdAt), { addSuffix: true, locale: fr })}
-        </p>
-        
-        <Button size="sm" onClick={() => onSelect(folder)}>
-          Voir le dossier
-        </Button>
       </CardContent>
     </Card>
   );

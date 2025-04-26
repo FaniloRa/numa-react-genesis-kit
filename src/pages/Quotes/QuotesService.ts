@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, CartItem } from "@/types";
 import { createNotification } from "@/services/NotificationService";
@@ -104,7 +105,8 @@ export const fetchQuoteItems = async (offerPlateId: string) => {
           id,
           name,
           description,
-          price,
+          price_monthly,
+          setup_fee,
           category,
           image_url
         )

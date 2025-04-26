@@ -92,7 +92,7 @@ export const AppSidebar: React.FC = () => {
   if (!auth.user) return null;
 
   return (
-    <Sidebar>
+    <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
           <h1 className="text-2xl font-bold text-vivid-purple">i-numa</h1>

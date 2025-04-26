@@ -7,7 +7,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Quote, CartItem, UserRole } from "@/types";
 import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus, fetchPaymentInfoByQuoteId } from "../QuotesService";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, File, Send, Check, X, Printer } from "lucide-react";
+import { ArrowLeft, File, Send, Check, X, Printer, SendToBack } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import DevisTemplate from "./DevisTemplate";
@@ -31,6 +31,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
   const [showPreview, setShowPreview] = useState(false);
 
   const isAdmin = hasRole(UserRole.ADMIN);
+  const isAgent = hasRole(UserRole.AGENT) && !isAdmin;
   const isClient = hasRole(UserRole.CLIENT);
 
   const loadQuoteDetails = async () => {
@@ -143,6 +144,18 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
             Rejeter
           </Button>
         </div>
+      );
+    }
+
+    if (isAgent && quote.status === "draft") {
+      return (
+        <Button
+          onClick={() => handleStatusUpdate("pending")}
+          disabled={processingAction}
+        >
+          <SendToBack className="h-4 w-4 mr-2" />
+          Envoyer à l'admin pour validation
+        </Button>
       );
     }
 
