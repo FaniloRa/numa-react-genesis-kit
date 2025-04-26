@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -28,7 +27,7 @@ import {
   Settings,
   LogOut
 } from "lucide-react";
-import { useToast } from "@/components/ui/toast";
+import { useToast } from "@/hooks/use-toast";
 
 export const AppSidebar: React.FC = () => {
   const { auth, hasRole, signOut } = useAuth();
