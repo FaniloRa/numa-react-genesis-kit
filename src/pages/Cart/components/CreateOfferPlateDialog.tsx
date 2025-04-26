@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -16,6 +16,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
@@ -23,6 +30,9 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useToast } from "@/hooks/use-toast";
 import { createOfferPlate } from "../CartService";
+import { fetchAllFolders } from "@/pages/OfferPlates/OfferPlatesService";
+import { useAuth } from "@/lib/auth";
+import { UserRole, Folder } from "@/types";
 
 interface CreateOfferPlateDialogProps {
   userId: string;
@@ -33,6 +43,7 @@ interface CreateOfferPlateDialogProps {
 
 const formSchema = z.object({
   name: z.string().min(1, "Le nom est requis"),
+  folderId: z.string().optional(),
 });
 
 type FormData = z.infer<typeof formSchema>;
@@ -44,19 +55,49 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
   onSuccess,
 }) => {
   const { toast } = useToast();
+  const { auth, hasRole } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const isAgent = auth.user && hasRole([UserRole.AGENT, UserRole.ADMIN]);
 
   const form = useForm<FormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "Ma plaquette d'offres",
+      folderId: undefined,
     },
   });
+
+  useEffect(() => {
+    if (open && isAgent) {
+      loadFolders();
+    }
+  }, [open, isAgent]);
+
+  const loadFolders = async () => {
+    if (!auth.user) return;
+    
+    try {
+      setLoading(true);
+      const foldersList = await fetchAllFolders(auth.user.id, isAgent);
+      setFolders(foldersList);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les dossiers existants",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
-      await createOfferPlate(userId, data.name);
+      await createOfferPlate(userId, data.name, data.folderId);
       toast({
         title: "Plaquette créée",
         description: "Votre plaquette d'offres a été créée avec succès.",
@@ -99,6 +140,38 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
                 </FormItem>
               )}
             />
+            
+            {isAgent && (
+              <FormField
+                control={form.control}
+                name="folderId"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Dossier (optionnel)</FormLabel>
+                    <FormControl>
+                      <Select 
+                        value={field.value} 
+                        onValueChange={field.onChange}
+                        disabled={loading}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Créer un nouveau dossier" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="">Créer un nouveau dossier</SelectItem>
+                          {folders.map(folder => (
+                            <SelectItem key={folder.id} value={folder.id}>
+                              {folder.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
             
             <DialogFooter className="flex justify-end gap-2">
               <Button variant="outline" type="button" onClick={onClose}>

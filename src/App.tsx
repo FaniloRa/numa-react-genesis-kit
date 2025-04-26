@@ -1,100 +1,119 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "@/components/AuthProvider";
-import ProtectedRoute from "@/components/ProtectedRoute";
-import { UserRole } from "@/types";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from '@/components/AuthProvider';
+import { MainLayout } from '@/components/layout/MainLayout';
+import { ProtectedRoute } from '@/components/ProtectedRoute';
+import { Toaster } from '@/components/ui/toaster';
 
-// Auth Pages
-import Login from "./pages/Auth/Login";
-import Register from "./pages/Auth/Register";
+import Index from '@/pages/Index';
+import Login from '@/pages/Auth/Login';
+import Register from '@/pages/Auth/Register';
+import Dashboard from '@/pages/Dashboard';
+import NotFound from '@/pages/NotFound';
+import Marketplace from '@/pages/Marketplace';
+import Clients from '@/pages/Clients';
+import Folders from '@/pages/Folders';
+import Quotes from '@/pages/Quotes';
+import QuoteDetailView from '@/pages/Quotes/components/QuoteDetailView';
+import CartPage from '@/pages/Cart';
+import OfferPlateDetailPage from '@/pages/OfferPlates/OfferPlateDetailPage';
 
-// Main Pages
-import Dashboard from "./pages/Dashboard";
-import Marketplace from "./pages/Marketplace";
-import CartPage from "./pages/Cart";
-import FoldersPage from "./pages/Folders";
-import QuotesPage from "./pages/Quotes";
-import ClientsPage from "./pages/Clients";
-import NotFound from "./pages/NotFound";
+import './App.css';
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+function App() {
+  return (
     <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Auth Routes */}
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            
-            {/* Redirect root to dashboard */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            
-            {/* Protected Routes */}
-            <Route 
-              path="/dashboard" 
-              element={
-                <ProtectedRoute>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
                   <Dashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/marketplace" 
-              element={
-                <ProtectedRoute>
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/marketplace"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
                   <Marketplace />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/cart" 
-              element={
-                <ProtectedRoute allowedRoles={[UserRole.CLIENT, UserRole.AGENT]}>
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/clients"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Clients />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/folders"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Folders />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quotes"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Quotes />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/quotes/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <QuoteDetailView />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/offer-plates/:id"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <OfferPlateDetailPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
                   <CartPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/folders" 
-              element={
-                <ProtectedRoute>
-                  <FoldersPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/quotes" 
-              element={
-                <ProtectedRoute>
-                  <QuotesPage />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/clients" 
-              element={
-                <ProtectedRoute allowedRoles={[UserRole.AGENT, UserRole.ADMIN]}>
-                  <ClientsPage />
-                </ProtectedRoute>
-              } 
-            />
-            
-            {/* 404 Not Found */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Router>
+      <Toaster />
     </AuthProvider>
-  </QueryClientProvider>
-);
+  );
+}
 
 export default App;

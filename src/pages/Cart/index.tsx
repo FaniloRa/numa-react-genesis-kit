@@ -19,6 +19,7 @@ const CartPage: React.FC = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [createdOfferPlateId, setCreatedOfferPlateId] = useState<string | null>(null);
 
   const loadCartItems = async () => {
     if (!auth.user) return;
@@ -41,6 +42,12 @@ const CartPage: React.FC = () => {
   useEffect(() => {
     loadCartItems();
   }, [auth.user]);
+
+  const handleSuccessfulCreation = (offerPlateId: string) => {
+    setCreatedOfferPlateId(offerPlateId);
+    loadCartItems();
+    navigate(`/offer-plates/${offerPlateId}`);
+  };
 
   return (
     <div className="space-y-6">
@@ -107,10 +114,7 @@ const CartPage: React.FC = () => {
           userId={auth.user.id}
           open={dialogOpen}
           onClose={() => setDialogOpen(false)}
-          onSuccess={() => {
-            loadCartItems();
-            navigate("/folders");
-          }}
+          onSuccess={handleSuccessfulCreation}
         />
       )}
     </div>

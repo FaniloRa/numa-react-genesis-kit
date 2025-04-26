@@ -2,6 +2,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { CartItem } from "@/types";
 import { mapCartItems } from "@/utils/dataMapper";
+import { createOfferPlateFromCart } from "@/pages/OfferPlates/OfferPlatesService";
+import { createNotification } from "@/services/NotificationService";
 
 export const fetchCartItems = async (userId: string) => {
   try {
@@ -78,7 +80,7 @@ export const removeCartItem = async (itemId: string) => {
   }
 };
 
-export const createOfferPlate = async (userId: string, name: string = "Plaquette d'offres") => {
+export const createOfferPlate = async (userId: string, name: string = "Plaquette d'offres", folderId?: string) => {
   try {
     // Find the user's cart
     const { data: carts, error: cartError } = await supabase
@@ -93,20 +95,80 @@ export const createOfferPlate = async (userId: string, name: string = "Plaquette
     // Use the first cart if multiple exist
     const cart = carts[0];
     
-    // Create a new offer plate with the cart items
-    const { data: newOfferPlate, error: createError } = await supabase
-      .from("offer_plates")
-      .update({
-        name,
-        status: "sent"
-      })
-      .eq("id", cart.id)
-      .select()
+    // Get the cart items
+    const cartItems = await fetchCartItems(userId);
+    
+    if (cartItems.length === 0) throw new Error("Votre panier est vide");
+    
+    // Get the agent id (using the current user as agent if they are an agent)
+    const { data: user, error: userError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
       .single();
+      
+    if (userError) throw userError;
     
-    if (createError) throw createError;
+    // Determine the agent ID
+    let agentId = userId;
+    let clientId = userId;
     
-    return newOfferPlate;
+    if (user.role === 'agent' || user.role === 'admin') {
+      agentId = userId;
+      // For agents, try to find the first client in the system
+      const { data: clients, error: clientsError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("role", "client")
+        .limit(1);
+        
+      if (!clientsError && clients && clients.length > 0) {
+        clientId = clients[0].id;
+      }
+    } else {
+      // For clients, try to find an agent
+      const { data: agents, error: agentsError } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("role", "agent")
+        .limit(1);
+        
+      if (!agentsError && agents && agents.length > 0) {
+        agentId = agents[0].id;
+      }
+    }
+    
+    // Create a new offer plate with the cart items
+    const result = await createOfferPlateFromCart(name, agentId, clientId, cartItems, folderId);
+    
+    // Clear the cart by removing its items
+    const { error: deleteError } = await supabase
+      .from("offer_plate_items")
+      .delete()
+      .eq("offer_plate_id", cart.id);
+      
+    if (deleteError) throw deleteError;
+    
+    // Create notification
+    await createNotification(
+      clientId,
+      "Nouvelle plaquette d'offres",
+      `Une nouvelle plaquette d'offres "${name}" a été créée.`,
+      "info",
+      `/offer-plates/${result.offerPlate.id}`
+    );
+    
+    if (agentId !== clientId) {
+      await createNotification(
+        agentId,
+        "Nouvelle plaquette d'offres",
+        `Une nouvelle plaquette d'offres "${name}" a été créée pour un client.`,
+        "info",
+        `/offer-plates/${result.offerPlate.id}`
+      );
+    }
+    
+    return result.offerPlate;
   } catch (error) {
     console.error("Error creating offer plate:", error);
     throw error;
