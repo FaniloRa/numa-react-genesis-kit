@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -32,6 +31,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
 
   const isAdmin = hasRole(UserRole.ADMIN);
   const isClient = hasRole(UserRole.CLIENT);
+  const isAgent = hasRole([UserRole.AGENT]);
 
   const loadQuoteDetails = async () => {
     try {
@@ -146,7 +146,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
       );
     }
 
-    if (!isAdmin && !isClient && quote.status === "approved") {
+    if (isAgent && quote.status === "approved") {
       return (
         <Button
           onClick={() => handleStatusUpdate("sent")}
@@ -178,6 +178,18 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
             Rejeter
           </Button>
         </div>
+      );
+    }
+
+    if (isAgent && quote.status === "draft") {
+      return (
+        <Button
+          onClick={() => handleStatusUpdate("pending")}
+          disabled={processingAction}
+        >
+          <Send className="h-4 w-4 mr-2" />
+          Envoyer à l'admin pour validation
+        </Button>
       );
     }
 

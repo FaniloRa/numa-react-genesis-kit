@@ -15,7 +15,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
     <SidebarProvider>
       <div className="min-h-screen flex w-full flex-col">
         <TopBar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 pt-[56px]">
           <AppSidebar />
           <SidebarInset className="p-4 md:p-6 w-full">
             {children}

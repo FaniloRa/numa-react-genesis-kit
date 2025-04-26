@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth';
-import { Bell, X, Check } from 'lucide-react';
+import { Bell, ShoppingCart, X } from 'lucide-react';
 import {
   Popover,
   PopoverContent,
@@ -72,9 +71,7 @@ const TopBar: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white shadow-sm py-2.5 px-4 flex justify-between items-center">
-      <div className="flex-1" /> {/* Empty div for spacing */}
-      
+    <div className="w-full bg-white shadow-sm py-2.5 px-4 flex justify-end items-center fixed top-0 z-50">
       <div className="flex items-center gap-6">
         <Popover>
           <PopoverTrigger asChild>
@@ -152,21 +149,9 @@ const TopBar: React.FC = () => {
           </PopoverContent>
         </Popover>
         
-        <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-gray-200 flex items-center justify-center">
-            <span className="text-sm font-medium text-gray-600">
-              {auth.user ? auth.user.firstName[0] : 'U'}
-            </span>
-          </div>
-          <div className="hidden md:block">
-            <p className="text-sm font-medium text-gray-700">
-              {auth.user ? `${auth.user.firstName} ${auth.user.lastName}` : 'Utilisateur'}
-            </p>
-            <p className="text-xs text-gray-500 capitalize">
-              {auth.user?.role || 'Non connecté'}
-            </p>
-          </div>
-        </div>
+        <Link to="/cart" className="relative">
+          <ShoppingCart className="h-5 w-5 text-gray-500 hover:text-gray-700" />
+        </Link>
       </div>
     </div>
   );
