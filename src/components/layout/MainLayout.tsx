@@ -17,7 +17,7 @@ export const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
         <TopBar />
         <div className="flex flex-1">
           <AppSidebar />
-          <SidebarInset className="p-4 md:p-6 w-full">
+          <SidebarInset className="p-4 md:p-6 w-full text-left">
             {children}
           </SidebarInset>
         </div>

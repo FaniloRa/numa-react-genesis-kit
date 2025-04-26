@@ -158,7 +158,7 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
                           <SelectValue placeholder="Créer un nouveau dossier" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">Créer un nouveau dossier</SelectItem>
+                          <SelectItem value="new">Créer un nouveau dossier</SelectItem>
                           {folders.map(folder => (
                             <SelectItem key={folder.id} value={folder.id}>
                               {folder.name}
