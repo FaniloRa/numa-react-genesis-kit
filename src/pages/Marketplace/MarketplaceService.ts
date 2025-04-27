@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Offer } from "@/types";
 import { mapOffers } from "@/utils/dataMapper";
@@ -52,6 +51,24 @@ export const fetchCategories = async () => {
     return categories;
   } catch (error) {
     console.error("Error fetching categories:", error);
+    throw error;
+  }
+};
+
+export const fetchOfferExtras = async (offerId: string) => {
+  try {
+    const { data, error } = await supabase
+      .from("offer_extras")
+      .select("*")
+      .eq("offer_id", offerId);
+
+    if (error) {
+      throw error;
+    }
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching offer extras:", error);
     throw error;
   }
 };

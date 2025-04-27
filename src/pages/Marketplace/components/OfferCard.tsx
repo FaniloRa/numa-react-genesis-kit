@@ -1,18 +1,20 @@
 
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { Offer } from "@/types";
 import { addToCart } from "../MarketplaceService";
-import { Eye, ShoppingCart, Info } from "lucide-react";
+import { Eye, ShoppingCart, Info, Briefcase } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { fetchOfferExtras } from "../MarketplaceService";
+import OfferExtrasDialog from "./OfferExtrasDialog";
 
 interface OfferCardProps {
   offer: Offer;
@@ -23,6 +25,27 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
   const { toast } = useToast();
   const { auth } = useAuth();
   const [showFeatures, setShowFeatures] = useState(false);
+  const [showExtras, setShowExtras] = useState(false);
+  const [extras, setExtras] = useState<any[]>([]);
+  const [selectedExtras, setSelectedExtras] = useState<{[key: string]: number}>({});
+  const [isLoadingExtras, setIsLoadingExtras] = useState(false);
+
+  const handleOpenExtras = useCallback(async () => {
+    setIsLoadingExtras(true);
+    try {
+      const extrasData = await fetchOfferExtras(offer.id);
+      setExtras(extrasData);
+      setShowExtras(true);
+    } catch (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de charger les options supplémentaires",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingExtras(false);
+    }
+  }, [offer.id, toast]);
 
   const handleAddToCart = async () => {
     try {
@@ -35,7 +58,7 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
         return;
       }
 
-      await addToCart(offer, 1, auth.user.id);
+      await addToCart(offer, 1, auth.user.id, selectedExtras);
       toast({
         title: "Ajouté au panier",
         description: `${offer.name} a été ajouté à votre panier.`,
@@ -84,40 +107,58 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
           <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full w-fit">
             {offer.category}
           </div>
-          {offer.features && offer.features.length > 0 && (
-            <>
+          <div className="flex flex-wrap gap-2">
+            {offer.features && offer.features.length > 0 && (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFeatures(true)}
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none w-fit"
+                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
               >
                 <Info className="h-4 w-4 mr-1" />
                 <span className="text-xs">Fonctionnalités</span>
               </Button>
+            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenExtras}
+              disabled={isLoadingExtras}
+              className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+            >
+              <Briefcase className="h-4 w-4 mr-1" />
+              <span className="text-xs">Options</span>
+            </Button>
+          </div>
 
-              <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
-                <DialogContent className="sm:max-w-[425px]">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold mb-4">
-                      Fonctionnalités de {offer.name}
-                    </DialogTitle>
-                  </DialogHeader>
-                  <div className="space-y-4">
-                    <p className="text-sm text-gray-600">{offer.description}</p>
-                    <div className="space-y-2">
-                      {offer.features.map((feature, index) => (
-                        <div key={index} className="flex items-start gap-2">
-                          <div className="h-2 w-2 rounded-full bg-[#6E59A5] mt-2" />
-                          <p className="text-sm text-gray-700">{feature}</p>
-                        </div>
-                      ))}
+          <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle className="text-lg font-semibold mb-4">
+                  Fonctionnalités de {offer.name}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <p className="text-sm text-gray-600">{offer.description}</p>
+                <div className="space-y-2">
+                  {offer.features.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-2">
+                      <div className="h-2 w-2 rounded-full bg-[#6E59A5] mt-2" />
+                      <p className="text-sm text-gray-700">{feature}</p>
                     </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </>
-          )}
+                  ))}
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <OfferExtrasDialog
+            open={showExtras}
+            onOpenChange={setShowExtras}
+            extras={extras}
+            onSaveSelection={setSelectedExtras}
+            initialSelection={selectedExtras}
+          />
         </div>
       </CardContent>
       <CardFooter className="flex justify-between pt-4 border-t">
