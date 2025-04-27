@@ -55,55 +55,57 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
 
   return (
     <Card className="overflow-hidden h-full flex flex-col">
-      <CardHeader>
-        <CardTitle className="line-clamp-1">{offer.name}</CardTitle>
+      <CardHeader className="pb-2 space-y-2">
+        <CardTitle className="line-clamp-1 text-xl font-bold text-gray-900">{offer.name}</CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow">
-        <p className="text-sm text-muted-foreground mb-2 line-clamp-2">
+      <CardContent className="flex-grow space-y-4">
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
           {offer.description}
         </p>
-        <div className="space-y-1">
+        <div className="space-y-3">
           {offer.priceMonthly > 0 && (
-            <p className="font-bold">
-              A partir de {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-muted-foreground">/mois</span>
+            <p className="font-bold text-lg text-gray-900">
+              A partir de {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-gray-600">/mois</span>
             </p>
           )}
           {offer.setupFee > 0 && (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm font-medium text-gray-700">
               Prix de création : {Number(offer.setupFee).toFixed(2)} €
             </p>
           )}
           {offer.priceMonthly === 0 && offer.setupFee === 0 && (
-            <p className="font-medium text-muted-foreground">Sur devis</p>
+            <p className="font-medium text-gray-700">Sur devis</p>
           )}
         </div>
-        <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">
-          {offer.category}
+        <div className="flex items-center justify-between pt-2">
+          <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+            {offer.category}
+          </div>
+          {offer.features && offer.features.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Fonctionnalités</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[280px]">
+                <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
+                {offer.features.map((feature, index) => (
+                  <DropdownMenuItem key={index} className="py-2">
+                    {feature}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
-        {offer.features && offer.features.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-              >
-                <List className="h-4 w-4 mr-1" />
-                <span className="text-xs">Fonctionnalités</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[280px]">
-              <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
-              {offer.features.map((feature, index) => (
-                <DropdownMenuItem key={index} className="py-2">
-                  {feature}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
       </CardContent>
-      <CardFooter className="flex justify-between pt-2 border-t">
+      <CardFooter className="flex justify-between pt-4 border-t">
         <Button
           variant="outline"
           size="sm"
