@@ -26,7 +26,10 @@ export const fetchOfferPlateDetails = async (offerPlateId: string) => {
             price_monthly, 
             setup_fee, 
             category,
-            image_url
+            image_url,
+            offer_features (
+              feature
+            )
           )
         )
       `)
@@ -54,7 +57,8 @@ export const fetchOfferPlateDetails = async (offerPlateId: string) => {
           setupFee: item.offers.setup_fee,
           category: item.offers.category,
           imageUrl: item.offers.image_url,
-          isActive: true
+          isActive: true,
+          features: item.offers.offer_features?.map(f => f.feature) || []
         },
         quantity: item.quantity
       }))

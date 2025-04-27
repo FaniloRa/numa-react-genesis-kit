@@ -39,6 +39,17 @@ const OfferPlatePreview: React.FC<OfferPlatePreviewProps> = ({ items, offerPlate
                     <h3 className="text-lg font-bold text-[#1A1F2C]">{item.offer.name}</h3>
                     <p className="text-gray-600 mt-1">{item.offer.description}</p>
                     
+                    {item.offer.features && item.offer.features.length > 0 && (
+                      <div className="mt-3">
+                        <h4 className="text-sm font-medium text-gray-700 mb-1">Fonctionnalités:</h4>
+                        <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
+                          {item.offer.features.map((feature, idx) => (
+                            <li key={idx}>{feature}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    
                     <div className="mt-4 text-sm space-y-1">
                       <div className="flex items-center">
                         <span className="font-medium">Catégorie:</span>
