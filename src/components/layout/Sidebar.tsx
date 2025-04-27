@@ -73,7 +73,7 @@ export const AppSidebar: React.FC = () => {
         roles: [UserRole.CLIENT, UserRole.AGENT, UserRole.ADMIN],
       },
       {
-        title: "Mon Devis",
+        title: "Devis",
         path: "/quotes",
         icon: FileText,
         roles: [UserRole.CLIENT, UserRole.AGENT, UserRole.ADMIN],
