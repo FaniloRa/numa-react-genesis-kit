@@ -95,23 +95,31 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
   }
 }
 
 @layer components {
-  /* Flat UI styles */
+  /* Modern flat UI styles */
   .flat-card {
-    @apply bg-background border border-border shadow-none rounded-lg transition-all duration-200;
+    @apply bg-background border border-border/40 shadow-sm hover:shadow-md transition-all duration-200 rounded-xl;
+  }
+
+  .elevated-card {
+    @apply bg-background/95 backdrop-blur-sm border border-border/40 shadow-md hover:shadow-lg transition-all duration-200 rounded-xl;
   }
 
   .flat-input {
-    @apply bg-background border border-input rounded-md shadow-none transition-colors duration-200;
+    @apply bg-background/80 backdrop-blur-sm border border-input/60 rounded-lg shadow-none transition-all duration-200 focus:border-primary/60 focus:ring-1 focus:ring-primary/30;
+  }
+
+  .interactive-element {
+    @apply transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98];
   }
 
   /* Sidebar animations */
   .sidebar-item {
-    @apply transition-all duration-200 ease-in-out rounded-md;
+    @apply relative transition-all duration-200 ease-out rounded-md overflow-hidden;
   }
 
   .sidebar-item:hover {
@@ -120,10 +128,49 @@
 
   .sidebar-item.active {
     @apply bg-primary text-primary-foreground;
+    box-shadow: 0 0 0 1px theme('colors.primary');
   }
 
-  /* Smooth transitions */
+  .sidebar-item.active::before {
+    content: '';
+    @apply absolute left-0 top-0 h-full w-1 bg-primary-foreground/20;
+  }
+
+  /* Modern transitions */
   .smooth-transition {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-out;
+  }
+
+  /* Modern glass effect */
+  .glass-panel {
+    @apply bg-background/95 backdrop-blur-sm border border-border/40 shadow-sm;
+  }
+
+  /* Modern button styles */
+  .modern-button {
+    @apply relative overflow-hidden transition-all duration-200 ease-out 
+           hover:shadow-md active:shadow-sm active:translate-y-[1px]
+           disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none;
+  }
+
+  .modern-button::before {
+    content: '';
+    @apply absolute inset-0 bg-white/10 opacity-0 transition-opacity duration-200;
+  }
+
+  .modern-button:hover::before {
+    @apply opacity-100;
+  }
+
+  /* Modern scroll area */
+  .modern-scrollbar {
+    @apply scrollbar-thin scrollbar-thumb-border/60 scrollbar-track-transparent hover:scrollbar-thumb-border/80;
+  }
+
+  /* Modern input group */
+  .input-group {
+    @apply relative flex items-center gap-2 p-1 bg-background/80 backdrop-blur-sm 
+           border border-input/60 rounded-lg focus-within:border-primary/60 
+           focus-within:ring-1 focus-within:ring-primary/30 transition-all duration-200;
   }
 }

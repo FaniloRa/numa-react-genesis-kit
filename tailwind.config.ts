@@ -56,6 +56,24 @@ export default {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      boxShadow: {
+        'subtle': '0 2px 8px -2px rgba(0, 0, 0, 0.05)',
+        'soft': '0 4px 12px -4px rgba(0, 0, 0, 0.1)',
+      },
+      animation: {
+        'smooth-in': 'smoothIn 0.3s ease-out',
+        'smooth-out': 'smoothOut 0.3s ease-out',
+      },
+      keyframes: {
+        smoothIn: {
+          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' }
+        },
+        smoothOut: {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(4px)' }
+        }
+      }
     },
   },
   plugins: [require("tailwindcss-animate")],
