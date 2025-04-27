@@ -109,7 +109,7 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
         </div>
       )}
 
-      {item.offer.extras && item.offer.extras.length > 0 && item.selectedExtras && Object.keys(item.selectedExtras).length > 0 && (
+      {item.offer.extras && item.offer.extras.length > 0 && (
         <>
           <Button 
             variant="ghost" 
@@ -133,16 +133,14 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
           {showExtras && (
             <div className="mt-3 pl-4 border-t pt-3">
               <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
-                {Object.entries(item.selectedExtras).map(([extraId, quantity]) => {
-                  const extra = item.offer.extras?.find(e => e.id === extraId);
-                  if (extra && quantity > 0) {
-                    return (
-                      <li key={extraId}>
-                        {extra.name} - {quantity}x ({(extra.unitPrice * quantity).toFixed(2)}€)
-                      </li>
-                    );
-                  }
-                  return null;
+                {item.offer.extras.map((extra) => {
+                  const quantity = item.selectedExtras?.[extra.id] || 0;
+                  return (
+                    <li key={extra.id}>
+                      {extra.name} ({extra.unitPrice.toFixed(2)}€)
+                      {quantity > 0 && ` - ${quantity}x sélectionné(s)`}
+                    </li>
+                  );
                 })}
               </ul>
             </div>
