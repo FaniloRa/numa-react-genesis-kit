@@ -20,6 +20,9 @@ export interface AuthContextProps {
     phone?: string;
     address?: string;
     birthDate?: string;
+    businessSector?: string;
+    managerName?: string;
+    companyName?: string;
     role?: UserRole;
   }) => Promise<{ error: any | null }>;
   signOut: () => Promise<void>;
