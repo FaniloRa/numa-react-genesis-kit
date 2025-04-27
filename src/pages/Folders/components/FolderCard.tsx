@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Folder, UserRole } from "@/types";
@@ -60,22 +59,22 @@ const FolderCard: React.FC<FolderCardProps> = ({ folder, onSelect }) => {
   
   return (
     <Card 
-      className="cursor-pointer hover:border-blue-300 transition-colors"
+      className="elevated-card cursor-pointer interactive-element"
       onClick={() => onSelect(folder)}
     >
       <CardContent className="p-4">
         <div className="flex items-start justify-between">
           <div className="flex items-center">
-            <div className="bg-blue-100 p-2 rounded-full mr-3">
-              <FolderOpen className="text-blue-500 h-5 w-5" />
+            <div className="glass-panel p-2 rounded-full mr-3">
+              <FolderOpen className="text-primary h-5 w-5" />
             </div>
-            <div>
+            <div className="space-y-1">
               <h3 className="font-semibold text-lg">{folder.name}</h3>
               <p className="text-sm text-muted-foreground">Créé le {formattedDate}</p>
               
               {/* Show client name for admin and agents */}
               {(isAdmin || isAgent) && clientName && (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-sm text-muted-foreground">
                   <span className="font-medium">Client:</span> {clientName}
                 </p>
               )}

@@ -2,7 +2,7 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Users } from "lucide-react";
+import { User } from "lucide-react";
 
 interface ClientCardProps {
   client: {
@@ -18,7 +18,7 @@ interface ClientCardProps {
 
 const ClientCard: React.FC<ClientCardProps> = ({ client, onSelect }) => {
   return (
-    <Card className="hover:shadow-md transition-shadow">
+    <Card className="elevated-card interactive-element">
       <CardHeader className="pb-2">
         <div className="flex justify-between">
           <CardTitle className="text-lg">
@@ -44,7 +44,7 @@ const ClientCard: React.FC<ClientCardProps> = ({ client, onSelect }) => {
           </p>
         </div>
         
-        <Button size="sm" onClick={() => onSelect(client.id)}>
+        <Button className="modern-button" size="sm" onClick={() => onSelect(client.id)}>
           Voir détails
         </Button>
       </CardContent>

@@ -47,7 +47,10 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, onSelect }) => {
   };
 
   return (
-    <Card className="cursor-pointer hover:shadow-md transition-shadow" onClick={() => onSelect(quote)}>
+    <Card 
+      className="elevated-card interactive-element" 
+      onClick={() => onSelect(quote)}
+    >
       <CardHeader className="pb-2">
         <CardTitle className="text-lg">Devis #{quote.id.substring(0, 8)}</CardTitle>
       </CardHeader>
@@ -65,7 +68,7 @@ const QuoteCard: React.FC<QuoteCardProps> = ({ quote, onSelect }) => {
           Créé {formatDistanceToNow(new Date(quote.createdAt), { addSuffix: true, locale: fr })}
         </p>
         
-        <Button size="sm" onClick={() => onSelect(quote)}>
+        <Button className="modern-button" size="sm" onClick={() => onSelect(quote)}>
           Voir détails
         </Button>
       </CardContent>
