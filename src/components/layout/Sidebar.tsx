@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -97,11 +98,11 @@ export const AppSidebar: React.FC = () => {
     <Sidebar variant="sidebar" collapsible="icon">
       <SidebarHeader className="p-4">
         <div className="flex items-center space-x-2">
-          <h1 className={cn("text-2xl font-bold text-vivid-purple", isCollapsed && "hidden")}>i-numa</h1>
-          <SidebarTrigger />
+          <h1 className={cn("text-2xl font-bold text-primary", isCollapsed && "hidden")}>i-numa</h1>
+          <SidebarTrigger className="hover:bg-accent/5 transition-colors duration-200" />
         </div>
         {auth.user && (
-          <div className={cn("mt-4 text-sm", isCollapsed && "hidden")}>
+          <div className={cn("mt-4 text-sm smooth-transition", isCollapsed && "hidden")}>
             <p className="font-medium">{auth.user.firstName} {auth.user.lastName}</p>
             <p className="text-xs text-muted-foreground capitalize">{auth.user.role}</p>
           </div>
@@ -119,10 +120,11 @@ export const AppSidebar: React.FC = () => {
                     asChild 
                     isActive={isActive(item.path)}
                     tooltip={item.title}
+                    className="sidebar-item"
                   >
-                    <Link to={item.path}>
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.title}</span>
+                    <Link to={item.path} className="group">
+                      <item.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
+                      <span className="transition-colors">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -135,17 +137,25 @@ export const AppSidebar: React.FC = () => {
       <SidebarFooter className="p-4">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Paramètres">
-              <Link to="/settings">
-                <Settings className="h-4 w-4" />
-                <span>Paramètres</span>
+            <SidebarMenuButton 
+              asChild 
+              tooltip="Paramètres"
+              className="sidebar-item"
+            >
+              <Link to="/settings" className="group">
+                <Settings className="h-4 w-4 transition-transform group-hover:scale-110" />
+                <span className="transition-colors">Paramètres</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={handleLogout} tooltip="Déconnexion">
-              <LogOut className="h-4 w-4" />
-              <span>Déconnexion</span>
+            <SidebarMenuButton 
+              onClick={handleLogout} 
+              tooltip="Déconnexion"
+              className="sidebar-item group"
+            >
+              <LogOut className="h-4 w-4 transition-transform group-hover:scale-110" />
+              <span className="transition-colors">Déconnexion</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
