@@ -68,7 +68,7 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
           )}
           
           <div className="w-auto mr-4">
-            <div className="text-xs text-muted-foreground mb-1">Extras</div>
+            <div className="text-xs text-muted-foreground mb-1">Options</div>
             {item.offer.extras?.length ? (
               <Button
                 variant="outline"
@@ -77,9 +77,9 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
                 className="h-8"
               >
                 {extrasCount > 0 ? (
-                  <>{extrasCount} extras ({extrasTotal.toFixed(2)}€)</>
+                  <>{extrasCount} options ({extrasTotal.toFixed(2)}€)</>
                 ) : (
-                  "Ajouter des extras"
+                  "Ajouter des options"
                 )}
                 <Plus className="ml-2 h-4 w-4" />
               </Button>
