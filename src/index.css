@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -110,7 +111,7 @@
 
   /* Sidebar animations */
   .sidebar-item {
-    @apply transition-all duration-200 ease-in-out;
+    @apply transition-all duration-200 ease-in-out rounded-md;
   }
 
   .sidebar-item:hover {
@@ -118,7 +119,7 @@
   }
 
   .sidebar-item.active {
-    @apply bg-accent/10;
+    @apply bg-primary text-primary-foreground;
   }
 
   /* Smooth transitions */

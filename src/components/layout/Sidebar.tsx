@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -120,10 +119,15 @@ export const AppSidebar: React.FC = () => {
                     asChild 
                     isActive={isActive(item.path)}
                     tooltip={item.title}
-                    className="sidebar-item"
+                    className={cn(
+                      "sidebar-item",
+                      isActive(item.path) && "active"
+                    )}
                   >
                     <Link to={item.path} className="group">
-                      <item.icon className="h-4 w-4 transition-transform group-hover:scale-110" />
+                      <item.icon className={cn(
+                        "h-4 w-4 transition-transform group-hover:scale-110",
+                      )} />
                       <span className="transition-colors">{item.title}</span>
                     </Link>
                   </SidebarMenuButton>
@@ -140,7 +144,11 @@ export const AppSidebar: React.FC = () => {
             <SidebarMenuButton 
               asChild 
               tooltip="Paramètres"
-              className="sidebar-item"
+              isActive={isActive("/settings")}
+              className={cn(
+                "sidebar-item",
+                isActive("/settings") && "active"
+              )}
             >
               <Link to="/settings" className="group">
                 <Settings className="h-4 w-4 transition-transform group-hover:scale-110" />
