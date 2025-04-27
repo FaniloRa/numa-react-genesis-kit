@@ -12,6 +12,7 @@ import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 interface FolderDetailViewProps {
   folder: Folder;
@@ -53,6 +54,27 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
 
   useEffect(() => {
     loadFolderDetails();
+
+    // Subscribe to real-time updates for offer plates
+    const channel = supabase
+      .channel('offer-plates-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'offer_plates',
+          filter: `folder_id=eq.${folder.id}`
+        },
+        () => {
+          loadFolderDetails();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [folder]);
 
   useEffect(() => {
