@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Dialog,
@@ -59,22 +60,22 @@ const OfferExtrasDialog: React.FC<OfferExtrasDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold mb-4">
             Options supplémentaires
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-[2fr,1fr,1fr] gap-4 py-2 font-medium text-sm text-gray-600 sticky top-0 bg-white z-10">
+        <div className="space-y-4 flex-1 overflow-hidden">
+          <div className="grid grid-cols-[2fr,1fr,1fr] gap-4 py-2 font-medium text-sm text-gray-600 bg-white z-10">
             <div>Description</div>
             <div>Prix unitaire</div>
             <div>Quantité</div>
           </div>
 
-          <ScrollArea className="max-h-[300px] pr-4">
-            <div className="space-y-3">
+          <ScrollArea className="h-[300px] overflow-auto">
+            <div className="space-y-3 pr-4">
               {extras.map((extra) => (
                 <div
                   key={extra.id}
