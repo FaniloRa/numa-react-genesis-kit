@@ -2,10 +2,11 @@
 import React, { useState } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { Trash2 } from "lucide-react";
+import { Trash2, Package } from "lucide-react";
 import { CartItem } from "@/types";
 import { updateCartItemQuantity, removeCartItem } from "../CartService";
 import { useToast } from "@/hooks/use-toast";
+import { Badge } from "@/components/ui/badge";
 
 interface CartItemRowProps {
   item: CartItem;
@@ -38,6 +39,12 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
     }
   };
 
+  // Calcul du prix des extras pour cet article
+  const extrasCount = item.extras?.length || 0;
+  const extrasTotalPrice = item.extras?.reduce((total, extra) => {
+    return total + (extra.unitPrice * extra.quantity);
+  }, 0) || 0;
+
   return (
     <TableRow>
       <TableCell className="font-medium">{item.offer.name}</TableCell>
@@ -47,6 +54,19 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
       </TableCell>
       <TableCell className="text-right">
         {item.offer.priceMonthly > 0 ? `${Number(item.offer.priceMonthly).toFixed(2)}€` : "-"}
+      </TableCell>
+      <TableCell>
+        {extrasCount > 0 ? (
+          <div className="flex items-center">
+            <Badge variant="secondary" className="flex items-center gap-1">
+              <Package className="h-3 w-3" />
+              <span>{extrasCount}</span>
+            </Badge>
+            <span className="ml-2 text-sm text-gray-600">+{extrasTotalPrice.toFixed(2)}€</span>
+          </div>
+        ) : (
+          "-"
+        )}
       </TableCell>
       <TableCell>
         <Button 

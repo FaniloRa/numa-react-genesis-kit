@@ -29,58 +29,84 @@ const OfferPlatePreview: React.FC<OfferPlatePreviewProps> = ({ items, offerPlate
 
           {/* Offers */}
           <div className="space-y-8">
-            {items.map((item, index) => (
-              <div 
-                key={index}
-                className="bg-white border border-gray-200 rounded-md p-5 transition-shadow hover:shadow-md"
-              >
-                <div className="flex flex-col md:flex-row justify-between">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-[#1A1F2C]">{item.offer.name}</h3>
-                    <p className="text-gray-600 mt-1">{item.offer.description}</p>
-                    
-                    {item.offer.features && item.offer.features.length > 0 && (
-                      <div className="mt-3">
-                        <h4 className="text-sm font-medium text-gray-700 mb-1">Fonctionnalités:</h4>
-                        <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
-                          {item.offer.features.map((feature, idx) => (
-                            <li key={idx}>{feature}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                    
-                    <div className="mt-4 text-sm space-y-1">
-                      <div className="flex items-center">
-                        <span className="font-medium">Catégorie:</span>
-                        <span className="ml-2 text-gray-600 capitalize">{item.offer.category}</span>
-                      </div>
-                      <div className="flex items-center">
-                        <span className="font-medium">Quantité:</span>
-                        <span className="ml-2 text-gray-600">{item.quantity}</span>
+            {items.map((item, index) => {
+              // Calculer le prix total des extras pour cet article
+              const extrasTotalPrice = item.extras?.reduce((sum, extra) => 
+                sum + (extra.unitPrice * (extra.quantity || 0)), 0
+              ) || 0;
+              
+              return (
+                <div 
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-md p-5 transition-shadow hover:shadow-md"
+                >
+                  <div className="flex flex-col md:flex-row justify-between">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-[#1A1F2C]">{item.offer.name}</h3>
+                      <p className="text-gray-600 mt-1">{item.offer.description}</p>
+                      
+                      {item.offer.features && item.offer.features.length > 0 && (
+                        <div className="mt-3">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">Fonctionnalités:</h4>
+                          <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
+                            {item.offer.features.map((feature, idx) => (
+                              <li key={idx}>{feature}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      {item.extras && item.extras.length > 0 && (
+                        <div className="mt-3">
+                          <h4 className="text-sm font-medium text-gray-700 mb-1">Options sélectionnées:</h4>
+                          <ul className="text-sm text-gray-600 list-disc pl-5 space-y-1">
+                            {item.extras.filter(e => (e.quantity || 0) > 0).map((extra, idx) => (
+                              <li key={idx}>
+                                {extra.name} ({extra.quantity} x {extra.unitPrice.toFixed(2)} €)
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      
+                      <div className="mt-4 text-sm space-y-1">
+                        <div className="flex items-center">
+                          <span className="font-medium">Catégorie:</span>
+                          <span className="ml-2 text-gray-600 capitalize">{item.offer.category}</span>
+                        </div>
+                        <div className="flex items-center">
+                          <span className="font-medium">Quantité:</span>
+                          <span className="ml-2 text-gray-600">{item.quantity}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  <div className="mt-4 md:mt-0 md:ml-6 md:text-right">
-                    <div className="space-y-1">
-                      {item.offer.setupFee > 0 && (
-                        <div>
-                          <span className="text-sm text-gray-500">Frais initiaux</span>
-                          <p className="font-semibold text-[#6E59A5]">{item.offer.setupFee} €</p>
-                        </div>
-                      )}
-                      {item.offer.priceMonthly > 0 && (
-                        <div>
-                          <span className="text-sm text-gray-500">Abonnement mensuel</span>
-                          <p className="font-semibold text-[#6E59A5]">{item.offer.priceMonthly} €</p>
-                        </div>
-                      )}
+                    <div className="mt-4 md:mt-0 md:ml-6 md:text-right">
+                      <div className="space-y-1">
+                        {item.offer.setupFee > 0 && (
+                          <div>
+                            <span className="text-sm text-gray-500">Frais initiaux</span>
+                            <p className="font-semibold text-[#6E59A5]">{item.offer.setupFee} €</p>
+                          </div>
+                        )}
+                        {item.offer.priceMonthly > 0 && (
+                          <div>
+                            <span className="text-sm text-gray-500">Abonnement mensuel</span>
+                            <p className="font-semibold text-[#6E59A5]">{item.offer.priceMonthly} €</p>
+                          </div>
+                        )}
+                        {extrasTotalPrice > 0 && (
+                          <div>
+                            <span className="text-sm text-gray-500">Options</span>
+                            <p className="font-semibold text-[#6E59A5]">{extrasTotalPrice.toFixed(2)} €</p>
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Footer */}
