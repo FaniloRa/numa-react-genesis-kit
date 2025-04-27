@@ -66,7 +66,7 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: "Ma plaquette d'offres",
-      folderId: undefined,
+      folderId: "new", // Default to creating a new folder
     },
   });
 
@@ -97,6 +97,7 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
   const onSubmit = async (data: FormData) => {
     try {
       setIsSubmitting(true);
+      // Pass the folder id as is - it will be handled in the service
       const offerPlate = await createOfferPlate(userId, data.name, data.folderId);
       toast({
         title: "Plaquette créée",
@@ -147,7 +148,7 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
                 name="folderId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Dossier (optionnel)</FormLabel>
+                    <FormLabel>Dossier</FormLabel>
                     <FormControl>
                       <Select 
                         value={field.value} 
@@ -155,7 +156,7 @@ const CreateOfferPlateDialog: React.FC<CreateOfferPlateDialogProps> = ({
                         disabled={loading}
                       >
                         <SelectTrigger>
-                          <SelectValue placeholder="Créer un nouveau dossier" />
+                          <SelectValue placeholder="Sélectionnez un dossier" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="new">Créer un nouveau dossier</SelectItem>

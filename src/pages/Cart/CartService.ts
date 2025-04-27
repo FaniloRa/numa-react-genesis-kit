@@ -138,8 +138,11 @@ export const createOfferPlate = async (userId: string, name: string = "Plaquette
       }
     }
     
+    // If folderId is "new", set it to undefined so a new folder will be created
+    const actualFolderId = folderId === "new" ? undefined : folderId;
+    
     // Create a new offer plate with the cart items
-    const result = await createOfferPlateFromCart(name, agentId, clientId, cartItems, folderId);
+    const result = await createOfferPlateFromCart(name, agentId, clientId, cartItems, actualFolderId);
     
     // Clear the cart by removing its items
     const { error: deleteError } = await supabase
