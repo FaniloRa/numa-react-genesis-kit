@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Offer, OfferExtra } from "@/types";
 import { mapOffers } from "@/utils/dataMapper";
@@ -73,7 +74,7 @@ export const fetchOfferExtras = async (offerId: string): Promise<OfferExtra[]> =
       id: extra.id,
       name: extra.name,
       description: extra.description,
-      unitPrice: extra.unit_price
+      unitPrice: Number(extra.unit_price) // Ensure unit_price is properly converted to number
     }));
   } catch (error) {
     console.error("Error fetching offer extras:", error);

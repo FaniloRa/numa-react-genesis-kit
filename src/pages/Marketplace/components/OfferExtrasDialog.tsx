@@ -9,13 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 import { ScrollArea } from "@/components/ui/scroll-area";
-
-interface Extra {
-  id: string;
-  name: string;
-  description: string | null;
-  unit_price: number;
-}
+import { OfferExtra } from "@/types";
 
 interface SelectedExtras {
   [key: string]: number;
@@ -24,7 +18,7 @@ interface SelectedExtras {
 interface OfferExtrasDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  extras: Extra[];
+  extras: OfferExtra[];
   onSaveSelection: (selectedExtras: SelectedExtras) => void;
   initialSelection?: SelectedExtras;
 }
@@ -88,7 +82,7 @@ const OfferExtrasDialog: React.FC<OfferExtrasDialogProps> = ({
                     )}
                   </div>
                   <div className="text-gray-900">
-                    {Number(extra.unit_price).toFixed(2)} €
+                    {extra.unitPrice.toFixed(2)} €
                   </div>
                   <div className="flex items-center space-x-2">
                     <Button
