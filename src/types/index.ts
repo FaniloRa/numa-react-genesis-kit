@@ -53,13 +53,6 @@ export interface CartItem {
   offer: Offer;
   quantity: number;
   offerPlateId?: string;
-  extras?: {
-    id: string;
-    name: string;
-    description?: string;
-    unitPrice: number;
-    quantity: number;
-  }[];
 }
 
 export interface OfferPlate {

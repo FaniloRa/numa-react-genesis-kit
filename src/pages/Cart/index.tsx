@@ -43,6 +43,7 @@ const CartPage: React.FC = () => {
     loadCartItems();
   }, [auth.user]);
 
+  // Fixed the function to wrap the navigate call inside another function that doesn't require parameters
   const handleSuccessfulCreation = (offerPlateId: string) => {
     setCreatedOfferPlateId(offerPlateId);
     loadCartItems();
@@ -68,7 +69,6 @@ const CartPage: React.FC = () => {
                   <TableHead>Description</TableHead>
                   <TableHead className="text-right">Création</TableHead>
                   <TableHead className="text-right">Mensualité</TableHead>
-                  <TableHead>Extras</TableHead>
                   <TableHead className="w-[70px]"></TableHead>
                 </TableRow>
               </TableHeader>

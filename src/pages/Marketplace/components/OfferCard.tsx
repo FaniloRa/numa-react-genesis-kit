@@ -30,9 +30,6 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
   const [selectedExtras, setSelectedExtras] = useState<{[key: string]: number}>({});
   const [isLoadingExtras, setIsLoadingExtras] = useState(false);
 
-  // On vérifie si l'offre a des extras disponibles
-  const hasExtras = offer.extras && offer.extras.length > 0;
-
   const handleOpenExtras = useCallback(async () => {
     setIsLoadingExtras(true);
     try {
@@ -122,18 +119,16 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
                 <span className="text-xs">Fonctionnalités</span>
               </Button>
             )}
-            {hasExtras && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleOpenExtras}
-                disabled={isLoadingExtras}
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-              >
-                <Briefcase className="h-4 w-4 mr-1" />
-                <span className="text-xs">Options</span>
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenExtras}
+              disabled={isLoadingExtras}
+              className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+            >
+              <Briefcase className="h-4 w-4 mr-1" />
+              <span className="text-xs">Options</span>
+            </Button>
           </div>
 
           <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
