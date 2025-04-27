@@ -11,6 +11,9 @@ export const fetchOffers = async (searchTerm?: string, category?: string) => {
         offer_features (
           id,
           feature
+        ),
+        offer_extras (
+          id
         )
       `);
 

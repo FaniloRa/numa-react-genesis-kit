@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,6 +19,23 @@ interface OfferCardProps {
   offer: Offer;
   onViewDetails: (offer: Offer) => void;
 }
+
+export const mapOffer = (data: any) => {
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    category: data.category,
+    imageUrl: data.image_url,
+    priceMonthly: data.price_monthly,
+    setupFee: data.setup_fee,
+    isActive: data.is_active,
+    createdAt: data.created_at,
+    features: data.offer_features?.map((f: any) => f.feature) || [],
+    hasExtras: data.offer_extras?.length > 0 || false,
+    extras: []
+  };
+};
 
 const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
   const { toast } = useToast();
@@ -107,29 +123,33 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
           <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full w-fit">
             {offer.category}
           </div>
-          <div className="flex flex-wrap gap-2">
-            {offer.features && offer.features.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowFeatures(true)}
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-              >
-                <Info className="h-4 w-4 mr-1" />
-                <span className="text-xs">Fonctionnalités</span>
-              </Button>
-            )}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleOpenExtras}
-              disabled={isLoadingExtras}
-              className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-            >
-              <Briefcase className="h-4 w-4 mr-1" />
-              <span className="text-xs">Options</span>
-            </Button>
-          </div>
+          
+      <div className="flex flex-wrap gap-2">
+        {offer.features && offer.features.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowFeatures(true)}
+            className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+          >
+            <Info className="h-4 w-4 mr-1" />
+            <span className="text-xs">Fonctionnalités</span>
+          </Button>
+        )}
+        {offer.hasExtras && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleOpenExtras}
+            disabled={isLoadingExtras}
+            className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+          >
+            <Briefcase className="h-4 w-4 mr-1" />
+            <span className="text-xs">Options</span>
+          </Button>
+        )}
+      </div>
+      
 
           <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
             <DialogContent className="sm:max-w-[425px]">

@@ -17,12 +17,7 @@ export const mapOffer = (data: any) => {
     isActive: data.is_active,
     createdAt: data.created_at,
     features: data.offer_features?.map((f: any) => f.feature) || [],
-    extras: data.offer_extras?.map((extra: any) => ({
-      id: extra.id,
-      name: extra.name,
-      description: extra.description,
-      unitPrice: extra.unit_price
-    })) || []
+    hasExtras: data.offer_extras?.length > 0 || false
   };
 };
 
@@ -68,7 +63,6 @@ export const mapOfferPlate = (data: any) => {
     agentId: data.agent_id,
     status: data.status,
     createdAt: data.created_at,
-    // Initialize items as empty array if not provided
     items: data.items || []
   };
 };
