@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,12 +25,24 @@ const ClientDashboard: React.FC = () => {
     try {
       setLoading(true);
       
-      const [
-        { data: folders },
-        { data: quotes },
-        { data: pendingQuotesData }
-      ] = await Promise.all([
-        supabase
+      const channel = supabase
+        .channel('public:folders')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'folders',
+            filter: `client_id=eq.${auth.user.id}`
+          },
+          () => {
+            loadFolders();
+          }
+        )
+        .subscribe();
+
+      const loadFolders = async () => {
+        const { data: folders } = await supabase
           .from("folders")
           .select(`
             id,
@@ -45,7 +56,15 @@ const ClientDashboard: React.FC = () => {
           `)
           .eq("client_id", auth.user.id)
           .order("created_at", { ascending: false })
-          .limit(3),
+          .limit(3);
+        
+        setRecentFolders(folders || []);
+      };
+
+      const [
+        { data: quotes },
+        { data: pendingQuotesData }
+      ] = await Promise.all([
         supabase
           .from("quotes")
           .select(`
@@ -80,10 +99,14 @@ const ClientDashboard: React.FC = () => {
           .order("created_at", { ascending: false })
           .limit(5)
       ]);
-      
-      setRecentFolders(folders || []);
+
+      await loadFolders();
       setRecentQuotes(quotes || []);
       setPendingQuotes(pendingQuotesData || []);
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
     } catch (error) {
       console.error("Error loading client dashboard:", error);
       toast({

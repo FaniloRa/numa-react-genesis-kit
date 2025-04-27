@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Folder, OfferPlate, Quote } from "@/types";
 import { fetchOfferPlatesForFolder, fetchQuotesForFolder } from "../FoldersService";
@@ -10,6 +11,7 @@ import { ArrowLeft, Eye } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
 import { useNavigate } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
 
 interface FolderDetailViewProps {
   folder: Folder;
@@ -23,6 +25,8 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
   const [offerPlates, setOfferPlates] = useState<OfferPlate[]>([]);
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [filteredOfferPlates, setFilteredOfferPlates] = useState<OfferPlate[]>([]);
 
   const loadFolderDetails = async () => {
     try {
@@ -35,6 +39,7 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
       
       setOfferPlates(plates);
       setQuotes(quotesList);
+      setFilteredOfferPlates(plates);
     } catch (error: any) {
       toast({
         title: "Erreur de chargement",
@@ -50,8 +55,15 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
     loadFolderDetails();
   }, [folder]);
 
+  useEffect(() => {
+    if (statusFilter === "all") {
+      setFilteredOfferPlates(offerPlates);
+    } else {
+      setFilteredOfferPlates(offerPlates.filter(plate => plate.status === statusFilter));
+    }
+  }, [statusFilter, offerPlates]);
+
   const handleViewOfferPlateDetails = (plate: OfferPlate) => {
-    // Implementation pour visualiser les plaquettes
     navigate(`/offer-plates/${plate.id}`);
   };
 
@@ -73,6 +85,8 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
         return "bg-yellow-100 text-yellow-800";
       case "approved":
         return "bg-green-100 text-green-800";
+      case "production":
+        return "bg-purple-100 text-purple-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -91,6 +105,8 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
           return "Accepté";
         case "rejected":
           return "Rejeté";
+        case "production":
+          return "En production";
         default:
           return status;
       }
@@ -104,6 +120,8 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
           return "Acceptée";
         case "rejected":
           return "Rejetée";
+        case "production":
+          return "En production";
         default:
           return status;
       }
@@ -133,15 +151,31 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
         </TabsList>
         
         <TabsContent value="offer-plates">
+          <div className="mb-4">
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Filtrer par statut" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="draft">Brouillon</SelectItem>
+                <SelectItem value="sent">Envoyé</SelectItem>
+                <SelectItem value="accepted">Accepté</SelectItem>
+                <SelectItem value="rejected">Rejeté</SelectItem>
+                <SelectItem value="production">En production</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {[...Array(2)].map((_, i) => (
                 <div key={i} className="h-32 bg-muted animate-pulse rounded-md" />
               ))}
             </div>
-          ) : offerPlates.length > 0 ? (
+          ) : filteredOfferPlates.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {offerPlates.map((plate) => (
+              {filteredOfferPlates.map((plate) => (
                 <Card key={plate.id} className="hover:shadow-md transition-shadow">
                   <CardHeader className="pb-2">
                     <CardTitle className="text-lg">{plate.name}</CardTitle>
@@ -151,11 +185,9 @@ const FolderDetailView: React.FC<FolderDetailViewProps> = ({ folder, onBack }) =
                       Créé {formatDistanceToNow(new Date(plate.createdAt), { addSuffix: true, locale: fr })}
                     </p>
                     <div className="flex justify-between items-center">
-                      <span
-                        className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(plate.status)}`}
-                      >
+                      <Badge variant="secondary" className={getStatusStyle(plate.status)}>
                         {getStatusText(plate.status)}
-                      </span>
+                      </Badge>
                       
                       <Button size="sm" onClick={() => handleViewOfferPlateDetails(plate)}>
                         <Eye className="h-4 w-4 mr-1" />
