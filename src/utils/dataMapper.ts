@@ -16,7 +16,13 @@ export const mapOffer = (data: any) => {
     setupFee: data.setup_fee,
     isActive: data.is_active,
     createdAt: data.created_at,
-    features: data.offer_features?.map((f: any) => f.feature) || []
+    features: data.offer_features?.map((f: any) => f.feature) || [],
+    extras: data.offer_extras?.map((extra: any) => ({
+      id: extra.id,
+      name: extra.name,
+      description: extra.description,
+      unitPrice: extra.unit_price
+    })) || []
   };
 };
 

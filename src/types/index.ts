@@ -26,6 +26,13 @@ export interface User {
   createdAt: string;
 }
 
+export interface OfferExtra {
+  id: string;
+  name: string;
+  description?: string;
+  unitPrice: number;
+}
+
 export interface Offer {
   id: string;
   name: string;
@@ -37,6 +44,7 @@ export interface Offer {
   isActive: boolean;
   createdAt?: string;
   features: string[];
+  extras?: OfferExtra[];
 }
 
 export interface CartItem {

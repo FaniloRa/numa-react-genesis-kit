@@ -1,6 +1,5 @@
-
 import { supabase } from "@/integrations/supabase/client";
-import { Offer } from "@/types";
+import { Offer, OfferExtra } from "@/types";
 import { mapOffers } from "@/utils/dataMapper";
 
 export const fetchOffers = async (searchTerm?: string, category?: string) => {
@@ -56,18 +55,23 @@ export const fetchCategories = async () => {
   }
 };
 
-export const fetchOfferExtras = async (offerId: string) => {
+export const fetchOfferExtras = async (offerId: string): Promise<OfferExtra[]> => {
   try {
     const { data, error } = await supabase
-      .from("offer_extras")
-      .select("*")
-      .eq("offer_id", offerId);
+      .from('offer_extras')
+      .select('*')
+      .eq('offer_id', offerId);
 
     if (error) {
       throw error;
     }
 
-    return data;
+    return data.map(extra => ({
+      id: extra.id,
+      name: extra.name,
+      description: extra.description,
+      unitPrice: extra.unit_price
+    }));
   } catch (error) {
     console.error("Error fetching offer extras:", error);
     throw error;
