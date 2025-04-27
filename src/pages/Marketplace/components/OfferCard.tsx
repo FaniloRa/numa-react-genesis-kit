@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -54,17 +55,20 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
 
   return (
     <Card className="overflow-hidden h-full flex flex-col">
-      <CardHeader className="pb-2 space-y-2">
-        <CardTitle className="line-clamp-1 text-xl font-bold text-gray-900">{offer.name}</CardTitle>
+      <CardHeader className="pb-3 space-y-1">
+        <CardTitle className="line-clamp-1 text-xl font-semibold tracking-tight text-gray-900">
+          {offer.name}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="flex-grow space-y-4">
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+      <CardContent className="flex-grow space-y-6">
+        <p className="text-sm text-gray-600 leading-relaxed line-clamp-2">
           {offer.description}
         </p>
-        <div className="space-y-3">
+        <div className="space-y-4">
           {offer.priceMonthly > 0 && (
-            <p className="font-bold text-lg text-gray-900">
-              A partir de {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-gray-600">/mois</span>
+            <p className="font-semibold text-lg text-gray-900">
+              A partir de {Number(offer.priceMonthly).toFixed(2)} € 
+              <span className="text-sm font-normal text-gray-500 ml-1">/mois</span>
             </p>
           )}
           {offer.setupFee > 0 && (
@@ -76,8 +80,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
             <p className="font-medium text-gray-700">Sur devis</p>
           )}
         </div>
-        <div className="flex flex-col space-y-2">
-          <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full w-fit">
+        <div className="flex flex-col space-y-3">
+          <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1.5 rounded-full w-fit">
             {offer.category}
           </div>
           {offer.features && offer.features.length > 0 && (
