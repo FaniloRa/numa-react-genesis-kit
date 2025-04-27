@@ -80,6 +80,35 @@ export type Database = {
         }
         Relationships: []
       }
+      offer_features: {
+        Row: {
+          created_at: string | null
+          feature: string
+          id: string
+          offer_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          feature: string
+          id?: string
+          offer_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          feature?: string
+          id?: string
+          offer_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offer_features_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       offer_plate_items: {
         Row: {
           created_at: string | null

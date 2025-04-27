@@ -5,7 +5,15 @@ import { mapOffers } from "@/utils/dataMapper";
 
 export const fetchOffers = async (searchTerm?: string, category?: string) => {
   try {
-    let query = supabase.from("offers").select("*");
+    let query = supabase
+      .from("offers")
+      .select(`
+        *,
+        offer_features (
+          id,
+          feature
+        )
+      `);
 
     if (searchTerm) {
       query = query.ilike("name", `%${searchTerm}%`);
@@ -21,7 +29,6 @@ export const fetchOffers = async (searchTerm?: string, category?: string) => {
       throw error;
     }
 
-    // Use mapper to convert snake_case to camelCase
     return mapOffers(data);
   } catch (error) {
     console.error("Error fetching offers:", error);

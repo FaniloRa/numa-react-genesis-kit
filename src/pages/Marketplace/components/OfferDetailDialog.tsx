@@ -85,6 +85,18 @@ const OfferDetailDialog: React.FC<OfferDetailDialogProps> = ({
           </div>
           
           <div>
+            <h3 className="text-lg font-medium">Fonctionnalités</h3>
+            <ul className="mt-2 space-y-2">
+              {offer.features.map((feature, index) => (
+                <li key={index} className="flex items-start text-sm">
+                  <div className="mr-2 mt-0.5 h-2 w-2 rounded-full bg-primary" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div>
             <h3 className="text-lg font-medium">Prix</h3>
             <div className="space-y-1 mt-1">
               {offer.priceMonthly > 0 && (

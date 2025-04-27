@@ -2,11 +2,17 @@
 import React from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+  DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { Offer } from "@/types";
 import { addToCart } from "../MarketplaceService";
-import { Eye, ShoppingCart } from "lucide-react";
+import { Eye, ShoppingCart, List } from "lucide-react";
 
 interface OfferCardProps {
   offer: Offer;
@@ -70,8 +76,25 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
             <p className="font-medium text-muted-foreground">Sur devis</p>
           )}
         </div>
-        <div className="text-xs text-muted-foreground mt-2 inline-block bg-gray-100 px-2 py-0.5 rounded-full">
-          {offer.category}
+        <div className="flex items-center gap-2 mt-2">
+          <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">
+            {offer.category}
+          </div>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                <List className="h-4 w-4" />
+                <span className="sr-only">Fonctionnalités</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[280px]">
+              {offer.features.map((feature, index) => (
+                <DropdownMenuItem key={index} className="py-2">
+                  {feature}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       </CardContent>
       <CardFooter className="flex justify-between pt-2 border-t">

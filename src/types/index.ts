@@ -1,4 +1,3 @@
-
 // Add to existing types file
 export interface PaymentInfo {
   id: string;
@@ -37,6 +36,7 @@ export interface Offer {
   imageUrl?: string;
   isActive: boolean;
   createdAt?: string;
+  features: string[];
 }
 
 export interface CartItem {

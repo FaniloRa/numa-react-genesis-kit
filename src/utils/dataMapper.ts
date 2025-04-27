@@ -15,7 +15,8 @@ export const mapOffer = (data: any) => {
     priceMonthly: data.price_monthly,
     setupFee: data.setup_fee,
     isActive: data.is_active,
-    createdAt: data.created_at
+    createdAt: data.created_at,
+    features: data.offer_features?.map((f: any) => f.feature) || []
   };
 };
 
