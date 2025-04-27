@@ -77,33 +77,31 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
             <p className="font-medium text-muted-foreground">Sur devis</p>
           )}
         </div>
-        <div className="flex items-center gap-2 mt-2">
-          <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">
-            {offer.category}
-          </div>
-          {offer.features && offer.features.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-                >
-                  <List className="h-4 w-4 mr-1" />
-                  <span className="text-xs">Fonctionnalités</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[280px]">
-                <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
-                {offer.features.map((feature, index) => (
-                  <DropdownMenuItem key={index} className="py-2">
-                    {feature}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          )}
+        <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">
+          {offer.category}
         </div>
+        {offer.features && offer.features.length > 0 && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+              >
+                <List className="h-4 w-4 mr-1" />
+                <span className="text-xs">Fonctionnalités</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-[280px]">
+              <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
+              {offer.features.map((feature, index) => (
+                <DropdownMenuItem key={index} className="py-2">
+                  {feature}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </CardContent>
       <CardFooter className="flex justify-between pt-2 border-t">
         <Button
