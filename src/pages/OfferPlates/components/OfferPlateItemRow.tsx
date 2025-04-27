@@ -1,8 +1,7 @@
-
 import React, { useState } from "react";
 import { CartItem } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileMinus, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { FileMinus, ChevronDown, ChevronUp, Plus, Briefcase } from "lucide-react";
 import OfferExtrasDialog from "@/pages/Marketplace/components/OfferExtrasDialog";
 
 interface OfferPlateItemRowProps {
@@ -69,19 +68,19 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
           
           <div className="w-auto mr-4">
             <div className="text-xs text-muted-foreground mb-1">Options</div>
-            {item.offer.extras?.length ? (
+            {item.offer.hasExtras ? (
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => setExtrasDialogOpen(true)}
-                className="h-8"
+                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
               >
+                <Briefcase className="h-4 w-4 mr-1" />
                 {extrasCount > 0 ? (
-                  <>{extrasCount} options ({extrasTotal.toFixed(2)}€)</>
+                  <span className="text-xs">{extrasCount} options ({extrasTotal.toFixed(2)}€)</span>
                 ) : (
-                  "Ajouter des options"
+                  <span className="text-xs">Options</span>
                 )}
-                <Plus className="ml-2 h-4 w-4" />
               </Button>
             ) : (
               <div className="font-medium">-</div>
