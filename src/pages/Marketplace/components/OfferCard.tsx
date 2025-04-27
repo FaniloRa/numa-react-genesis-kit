@@ -1,3 +1,4 @@
+
 import React, { useState, useCallback } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -118,18 +119,16 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
                 <span className="text-xs">Fonctionnalités</span>
               </Button>
             )}
-            {extras && extras.length > 0 && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleOpenExtras}
-                disabled={isLoadingExtras}
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-              >
-                <Briefcase className="h-4 w-4 mr-1" />
-                <span className="text-xs">Options</span>
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenExtras}
+              disabled={isLoadingExtras}
+              className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+            >
+              <Briefcase className="h-4 w-4 mr-1" />
+              <span className="text-xs">Options</span>
+            </Button>
           </div>
 
           <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
