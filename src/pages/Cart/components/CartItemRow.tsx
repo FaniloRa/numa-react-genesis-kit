@@ -1,9 +1,8 @@
-
 import React, { useState } from "react";
 import { TableRow, TableCell } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { CartItem } from "@/types";
+import { CartItem, OfferExtra } from "@/types";
 import { updateCartItemQuantity, removeCartItem } from "../CartService";
 import { useToast } from "@/hooks/use-toast";
 
@@ -38,6 +37,21 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
     }
   };
 
+  const calculateExtrasTotal = () => {
+    if (!item.selectedExtras || !item.offer.extras) return 0;
+    return item.selectedExtras.reduce((total, selected) => {
+      const extra = item.offer.extras?.find(e => e.id === selected.extraId);
+      if (extra) {
+        total += extra.unitPrice * selected.quantity;
+      }
+      return total;
+    }, 0);
+  };
+
+  const getSelectedExtrasCount = () => {
+    return item.selectedExtras?.reduce((total, extra) => total + extra.quantity, 0) || 0;
+  };
+
   return (
     <TableRow>
       <TableCell className="font-medium">{item.offer.name}</TableCell>
@@ -47,6 +61,14 @@ const CartItemRow: React.FC<CartItemRowProps> = ({ item, onUpdate }) => {
       </TableCell>
       <TableCell className="text-right">
         {item.offer.priceMonthly > 0 ? `${Number(item.offer.priceMonthly).toFixed(2)}€` : "-"}
+      </TableCell>
+      <TableCell className="text-right">
+        {getSelectedExtrasCount() > 0 ? (
+          <div className="text-sm">
+            <div>{getSelectedExtrasCount()} extra(s)</div>
+            <div className="text-muted-foreground">{calculateExtrasTotal().toFixed(2)}€</div>
+          </div>
+        ) : "-"}
       </TableCell>
       <TableCell>
         <Button 
