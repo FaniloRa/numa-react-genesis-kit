@@ -6,7 +6,7 @@ import { Trash2, Plus } from "lucide-react";
 import { CartItem } from "@/types";
 import { updateCartItemQuantity, removeCartItem } from "../CartService";
 import { useToast } from "@/hooks/use-toast";
-import { OfferExtrasDialog } from "@/pages/Marketplace/components/OfferExtrasDialog";
+import OfferExtrasDialog from "@/pages/Marketplace/components/OfferExtrasDialog";
 
 interface CartItemRowProps {
   item: CartItem;

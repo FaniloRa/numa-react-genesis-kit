@@ -45,6 +45,7 @@ export interface CartItem {
   offer: Offer;
   quantity: number;
   offerPlateId?: string;
+  selectedExtras?: Record<string, number>; // Added for selected extras
 }
 
 export interface OfferPlate {

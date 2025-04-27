@@ -94,7 +94,8 @@ export const mapCartItem = (data: any) => {
     id: data.id,
     offerId: data.offer_id,
     offer: mapOffer(data.offers),
-    quantity: data.quantity
+    quantity: data.quantity,
+    selectedExtras: data.selected_extras || {}
   };
 };
 

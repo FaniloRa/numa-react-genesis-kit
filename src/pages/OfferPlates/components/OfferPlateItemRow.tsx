@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { CartItem } from "@/types";
 import { Button } from "@/components/ui/button";
 import { FileMinus, ChevronDown, ChevronUp, Plus } from "lucide-react";
-import { OfferExtrasDialog } from "@/pages/Marketplace/components/OfferExtrasDialog";
+import OfferExtrasDialog from "@/pages/Marketplace/components/OfferExtrasDialog";
 
 interface OfferPlateItemRowProps {
   item: CartItem;
