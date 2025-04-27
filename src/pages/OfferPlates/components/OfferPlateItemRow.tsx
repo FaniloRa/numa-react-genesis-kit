@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { CartItem } from "@/types";
 import { Button } from "@/components/ui/button";
-import { FileMinus, ChevronDown, ChevronUp, Plus, Briefcase } from "lucide-react";
+import { FileMinus, ChevronDown, ChevronUp, Briefcase } from "lucide-react";
 import OfferExtrasDialog from "@/pages/Marketplace/components/OfferExtrasDialog";
 
 interface OfferPlateItemRowProps {
@@ -16,6 +16,7 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
   onRemove
 }) => {
   const [showFeatures, setShowFeatures] = useState(false);
+  const [showExtras, setShowExtras] = useState(false);
   const [extrasDialogOpen, setExtrasDialogOpen] = useState(false);
 
   const extrasCount = Object.values(item.selectedExtras || {}).reduce((sum, quantity) => sum + quantity, 0);
@@ -106,6 +107,47 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
             ))}
           </ul>
         </div>
+      )}
+
+      {item.offer.extras && item.offer.extras.length > 0 && item.selectedExtras && Object.keys(item.selectedExtras).length > 0 && (
+        <>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="mt-1 h-7 px-2 text-xs text-muted-foreground hover:text-primary"
+            onClick={() => setShowExtras(!showExtras)}
+          >
+            {showExtras ? (
+              <>
+                <ChevronUp className="w-4 h-4 mr-1" /> 
+                Masquer les options
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4 mr-1" /> 
+                Afficher les options
+              </>
+            )}
+          </Button>
+
+          {showExtras && (
+            <div className="mt-3 pl-4 border-t pt-3">
+              <ul className="list-disc pl-5 space-y-1 text-sm text-gray-600">
+                {Object.entries(item.selectedExtras).map(([extraId, quantity]) => {
+                  const extra = item.offer.extras?.find(e => e.id === extraId);
+                  if (extra && quantity > 0) {
+                    return (
+                      <li key={extraId}>
+                        {extra.name} - {quantity}x ({(extra.unitPrice * quantity).toFixed(2)}€)
+                      </li>
+                    );
+                  }
+                  return null;
+                })}
+              </ul>
+            </div>
+          )}
+        </>
       )}
 
       {item.offer.extras && (
