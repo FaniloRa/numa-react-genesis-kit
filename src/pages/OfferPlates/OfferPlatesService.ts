@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Offer, CartItem, OfferPlate, Folder } from "@/types";
 import { mapOfferPlates, mapOffers, mapFolders } from "@/utils/dataMapper";
@@ -99,72 +98,29 @@ export const fetchAllFolders = async (userId: string, isAgent: boolean) => {
 
 export const updateOfferPlateItems = async (offerPlateId: string, items: CartItem[]) => {
   try {
-    // Récupérer d'abord tous les éléments existants
-    const { data: existingItems, error: fetchError } = await supabase
-      .from("offer_plate_items")
-      .select("id, offer_id")
-      .eq("offer_plate_id", offerPlateId);
+    // D'abord, supprimez tous les articles existants
+    await supabase
+      .from('offer_plate_items')
+      .delete()
+      .eq('offer_plate_id', offerPlateId);
     
-    if (fetchError) throw fetchError;
+    // Ensuite, insérez les nouveaux articles
+    const itemsToInsert = items.map(item => ({
+      offer_plate_id: offerPlateId,
+      offer_id: item.offerId,
+      quantity: item.quantity,
+      selected_extras: item.selectedExtras || {}
+    }));
+
+    const { error: insertError } = await supabase
+      .from('offer_plate_items')
+      .insert(itemsToInsert);
+
+    if (insertError) throw insertError;
     
-    // Définir quels éléments supprimer, ajouter ou mettre à jour
-    const existingItemMap = new Map(existingItems.map(item => [item.offer_id, item.id]));
-    const itemsToUpdate = [];
-    const itemsToAdd = [];
-    const idsToKeep = new Set();
-    
-    for (const item of items) {
-      if (existingItemMap.has(item.offerId)) {
-        const existingId = existingItemMap.get(item.offerId);
-        itemsToUpdate.push({
-          id: existingId,
-          quantity: item.quantity
-        });
-        idsToKeep.add(existingId);
-      } else {
-        itemsToAdd.push({
-          offer_plate_id: offerPlateId,
-          offer_id: item.offerId,
-          quantity: item.quantity
-        });
-      }
-    }
-    
-    // Trouver les éléments à supprimer
-    const idsToDelete = existingItems
-      .filter(item => !idsToKeep.has(item.id))
-      .map(item => item.id);
-    
-    // Exécuter toutes les opérations nécessaires
-    const promises = [];
-    
-    if (itemsToAdd.length > 0) {
-      promises.push(supabase
-        .from("offer_plate_items")
-        .insert(itemsToAdd)
-      );
-    }
-    
-    for (const item of itemsToUpdate) {
-      promises.push(supabase
-        .from("offer_plate_items")
-        .update({ quantity: item.quantity })
-        .eq("id", item.id)
-      );
-    }
-    
-    if (idsToDelete.length > 0) {
-      promises.push(supabase
-        .from("offer_plate_items")
-        .delete()
-        .in("id", idsToDelete)
-      );
-    }
-    
-    await Promise.all(promises);
     return true;
   } catch (error) {
-    console.error("Error updating offer plate items:", error);
+    console.error("Erreur lors de la mise à jour des articles de la plaquette :", error);
     throw error;
   }
 };

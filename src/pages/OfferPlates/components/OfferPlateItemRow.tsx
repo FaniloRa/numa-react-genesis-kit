@@ -2,12 +2,12 @@
 import React, { useState } from "react";
 import { CartItem } from "@/types";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { FileMinus, ChevronDown, ChevronUp } from "lucide-react";
+import { FileMinus, ChevronDown, ChevronUp, Plus } from "lucide-react";
+import { OfferExtrasDialog } from "@/pages/Marketplace/components/OfferExtrasDialog";
 
 interface OfferPlateItemRowProps {
   item: CartItem;
-  onQuantityChange: (itemId: string, quantity: number) => void;
+  onQuantityChange: (itemId: string, quantity: number, selectedExtras?: Record<string, number>) => void;
   onRemove: (itemId: string) => void;
 }
 
@@ -16,21 +16,14 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
   onQuantityChange,
   onRemove
 }) => {
-  const [quantity, setQuantity] = useState(item.quantity);
   const [showFeatures, setShowFeatures] = useState(false);
+  const [extrasDialogOpen, setExtrasDialogOpen] = useState(false);
 
-  const handleQuantityChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = parseInt(e.target.value);
-    if (!isNaN(value) && value > 0) {
-      setQuantity(value);
-    }
-  };
-
-  const handleBlur = () => {
-    if (quantity !== item.quantity) {
-      onQuantityChange(item.id || "", quantity);
-    }
-  };
+  const extrasCount = Object.values(item.selectedExtras || {}).reduce((sum, quantity) => sum + quantity, 0);
+  const extrasTotal = Object.entries(item.selectedExtras || {}).reduce((sum, [extraId, quantity]) => {
+    const extra = item.offer.extras?.find(e => e.id === extraId);
+    return sum + (extra ? extra.unitPrice * quantity : 0);
+  }, 0);
 
   return (
     <div className="flex flex-col p-4 border rounded-md bg-white">
@@ -74,16 +67,25 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
             </div>
           )}
           
-          <div className="w-20 mr-4">
-            <div className="text-xs text-muted-foreground mb-1">Quantité</div>
-            <Input
-              type="number"
-              value={quantity}
-              onChange={handleQuantityChange}
-              onBlur={handleBlur}
-              min={1}
-              className="h-8"
-            />
+          <div className="w-auto mr-4">
+            <div className="text-xs text-muted-foreground mb-1">Extras</div>
+            {item.offer.extras?.length ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setExtrasDialogOpen(true)}
+                className="h-8"
+              >
+                {extrasCount > 0 ? (
+                  <>{extrasCount} extras ({extrasTotal.toFixed(2)}€)</>
+                ) : (
+                  "Ajouter des extras"
+                )}
+                <Plus className="ml-2 h-4 w-4" />
+              </Button>
+            ) : (
+              <div className="font-medium">-</div>
+            )}
           </div>
           
           <Button
@@ -105,6 +107,18 @@ const OfferPlateItemRow: React.FC<OfferPlateItemRowProps> = ({
             ))}
           </ul>
         </div>
+      )}
+
+      {item.offer.extras && (
+        <OfferExtrasDialog
+          open={extrasDialogOpen}
+          onOpenChange={setExtrasDialogOpen}
+          extras={item.offer.extras}
+          onSaveSelection={(selectedExtras) => {
+            onQuantityChange(item.id || "", item.quantity, selectedExtras);
+          }}
+          initialSelection={item.selectedExtras}
+        />
       )}
     </div>
   );
