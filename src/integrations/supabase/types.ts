@@ -250,12 +250,16 @@ export type Database = {
           business_sector: string | null
           company_name: string | null
           created_at: string | null
+          email_notifications: boolean | null
           first_name: string | null
           id: string
+          language: string | null
           last_name: string | null
           manager_name: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
+          theme: string | null
+          timezone: string | null
           updated_at: string | null
         }
         Insert: {
@@ -264,12 +268,16 @@ export type Database = {
           business_sector?: string | null
           company_name?: string | null
           created_at?: string | null
+          email_notifications?: boolean | null
           first_name?: string | null
           id: string
+          language?: string | null
           last_name?: string | null
           manager_name?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          theme?: string | null
+          timezone?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -278,12 +286,16 @@ export type Database = {
           business_sector?: string | null
           company_name?: string | null
           created_at?: string | null
+          email_notifications?: boolean | null
           first_name?: string | null
           id?: string
+          language?: string | null
           last_name?: string | null
           manager_name?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          theme?: string | null
+          timezone?: string | null
           updated_at?: string | null
         }
         Relationships: []
