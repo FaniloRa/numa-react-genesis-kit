@@ -17,7 +17,7 @@ interface DashboardStatsProps {
 export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats, loading }) => {
   if (loading) {
     return (
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
         {[...Array(3)].map((_, i) => (
           <Card key={i} className="animate-pulse">
             <CardHeader className="pb-2">
@@ -34,7 +34,7 @@ export const DashboardStats: React.FC<DashboardStatsProps> = ({ stats, loading }
   }
 
   return (
-    <div className="grid grid-cols-1 gap-4">
+    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full">
       {stats.map((stat, i) => (
         <Card key={i}>
           <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">

@@ -1,4 +1,3 @@
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/components/AuthProvider';
 import { MainLayout } from '@/components/layout/MainLayout';
@@ -17,6 +16,7 @@ import Quotes from '@/pages/Quotes';
 import QuoteDetailPage from '@/pages/Quotes/components/QuoteDetailPage';
 import CartPage from '@/pages/Cart';
 import OfferPlateDetailPage from '@/pages/OfferPlates/OfferPlateDetailPage';
+import Settings from '@/pages/Settings';
 
 import './App.css';
 
@@ -104,6 +104,16 @@ function App() {
               <ProtectedRoute>
                 <MainLayout>
                   <CartPage />
+                </MainLayout>
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/settings"
+            element={
+              <ProtectedRoute>
+                <MainLayout>
+                  <Settings />
                 </MainLayout>
               </ProtectedRoute>
             }
