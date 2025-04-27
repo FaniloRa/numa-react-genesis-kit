@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -77,8 +76,8 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
             <p className="font-medium text-gray-700">Sur devis</p>
           )}
         </div>
-        <div className="flex items-center justify-between pt-2">
-          <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full">
+        <div className="flex flex-col space-y-2">
+          <div className="text-xs font-medium text-gray-600 bg-gray-100 px-3 py-1 rounded-full w-fit">
             {offer.category}
           </div>
           {offer.features && offer.features.length > 0 && (
@@ -87,7 +86,7 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
                 variant="outline"
                 size="sm"
                 onClick={() => setShowFeatures(true)}
-                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none w-fit"
               >
                 <Info className="h-4 w-4 mr-1" />
                 <span className="text-xs">Fonctionnalités</span>
