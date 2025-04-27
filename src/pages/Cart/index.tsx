@@ -67,8 +67,8 @@ const CartPage: React.FC = () => {
                 <TableRow>
                   <TableHead>Article</TableHead>
                   <TableHead>Description</TableHead>
-                  <TableHead className="text-right">Prix unitaire</TableHead>
-                  <TableHead className="text-right">Quantité</TableHead>
+                  <TableHead className="text-right">Création</TableHead>
+                  <TableHead className="text-right">Mensualité</TableHead>
                   <TableHead className="w-[70px]"></TableHead>
                 </TableRow>
               </TableHeader>

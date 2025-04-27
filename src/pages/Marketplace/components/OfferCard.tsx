@@ -84,9 +84,13 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
           {offer.features && offer.features.length > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                  <List className="h-4 w-4" />
-                  <span className="sr-only">Fonctionnalités</span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+                >
+                  <List className="h-4 w-4 mr-1" />
+                  <span className="text-xs">Fonctionnalités</span>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[280px]">
