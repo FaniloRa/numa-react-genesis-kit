@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Offer } from "@/types";
 import { mapOffers } from "@/utils/dataMapper";
@@ -73,7 +74,12 @@ export const fetchOfferExtras = async (offerId: string) => {
   }
 };
 
-export const addToCart = async (offer: Offer, quantity: number = 1, userId: string) => {
+export const addToCart = async (
+  offer: Offer, 
+  quantity: number = 1, 
+  userId: string, 
+  selectedExtras: {[key: string]: number} = {}
+) => {
   try {
     // Check if there's an existing cart (draft offer plate)
     const { data: existingCarts, error: cartError } = await supabase
@@ -135,6 +141,28 @@ export const addToCart = async (offer: Offer, quantity: number = 1, userId: stri
         });
       
       if (addError) throw addError;
+    }
+    
+    // Process selected extras if any
+    const extraEntries = Object.entries(selectedExtras);
+    if (extraEntries.length > 0) {
+      for (const [extraId, extraQuantity] of extraEntries) {
+        if (extraQuantity > 0) {
+          // For each selected extra with quantity > 0, add it to the cart
+          const { error: extraError } = await supabase
+            .from("offer_plate_items")
+            .insert({
+              offer_plate_id: cartId,
+              offer_id: extraId, // Using the extra ID as the offer ID
+              quantity: extraQuantity
+            });
+          
+          if (extraError) {
+            console.error("Error adding extra to cart:", extraError);
+            // Continue with other extras even if one fails
+          }
+        }
+      }
     }
     
     return true;
