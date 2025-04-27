@@ -5,15 +5,7 @@ import { mapUsers, mapUser } from "@/utils/dataMapper";
 
 export const fetchClients = async (searchTerm?: string) => {
   try {
-    // First, get the users from auth
-    const { data: authUsers, error: authError } = await supabase
-      .from("users")
-      .select("id, email")
-      .eq("role", "authenticated");
-
-    if (authError) throw authError;
-
-    // Then, get the profiles with full details
+    // Get profiles with client role
     let query = supabase
       .from("profiles")
       .select(`
@@ -38,14 +30,12 @@ export const fetchClients = async (searchTerm?: string) => {
     
     if (error) throw error;
     
-    // Combine the data, using real emails from auth.users where available
-    const users = profiles.map(profile => {
-      const authUser = authUsers ? authUsers.find(user => user.id === profile.id) : null;
-      return {
-        ...profile,
-        email: authUser?.email || `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`
-      };
-    });
+    // Since we can't directly query auth.users, we'll use placeholder emails
+    // based on first and last name as a fallback
+    const users = profiles.map(profile => ({
+      ...profile,
+      email: `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`
+    }));
     
     return mapUsers(users);
   } catch (error) {
@@ -56,14 +46,7 @@ export const fetchClients = async (searchTerm?: string) => {
 
 export const fetchClientDetails = async (clientId: string) => {
   try {
-    // First, try to get the email from auth users
-    const { data: authUser, error: authError } = await supabase
-      .from("users")
-      .select("email")
-      .eq("id", clientId)
-      .maybeSingle();
-
-    // Then, get the profile details
+    // Get the profile details
     const { data, error } = await supabase
       .from("profiles")
       .select(`
@@ -81,9 +64,8 @@ export const fetchClientDetails = async (clientId: string) => {
     
     if (error) throw error;
     
-    // Use real email if available, otherwise use the placeholder
-    const email = authUser?.email || 
-      `${data.first_name?.toLowerCase() || ''}${data.last_name?.toLowerCase() || ''}@example.com`;
+    // Create a placeholder email based on name
+    const email = `${data.first_name?.toLowerCase() || ''}${data.last_name?.toLowerCase() || ''}@example.com`;
     
     // Add email field to match User interface
     const user = {
