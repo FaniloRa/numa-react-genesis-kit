@@ -135,11 +135,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     phone?: string;
     address?: string;
     birthDate?: string;
+    businessSector: string;
+    managerName: string;
+    companyName: string;
     role?: UserRole;
   }) => {
     try {
-      const { email, password, firstName, lastName, phone, address, birthDate } = userData;
-      const role = userData.role || UserRole.CLIENT; // Default to CLIENT role
+      const {
+        email,
+        password,
+        firstName,
+        lastName,
+        phone,
+        address,
+        birthDate,
+        businessSector,
+        managerName,
+        companyName,
+      } = userData;
+      const role = userData.role || UserRole.CLIENT;
 
       // Register the user
       const { data, error } = await supabase.auth.signUp({
@@ -152,6 +166,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
             phone: phone,
             address: address,
             birth_date: birthDate,
+            business_sector: businessSector,
+            manager_name: managerName,
+            company_name: companyName,
             role: role,
           },
         },

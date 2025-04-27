@@ -247,10 +247,13 @@ export type Database = {
         Row: {
           address: string | null
           birth_date: string | null
+          business_sector: string | null
+          company_name: string | null
           created_at: string | null
           first_name: string | null
           id: string
           last_name: string | null
+          manager_name: string | null
           phone: string | null
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string | null
@@ -258,10 +261,13 @@ export type Database = {
         Insert: {
           address?: string | null
           birth_date?: string | null
+          business_sector?: string | null
+          company_name?: string | null
           created_at?: string | null
           first_name?: string | null
           id: string
           last_name?: string | null
+          manager_name?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null
@@ -269,10 +275,13 @@ export type Database = {
         Update: {
           address?: string | null
           birth_date?: string | null
+          business_sector?: string | null
+          company_name?: string | null
           created_at?: string | null
           first_name?: string | null
           id?: string
           last_name?: string | null
+          manager_name?: string | null
           phone?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string | null

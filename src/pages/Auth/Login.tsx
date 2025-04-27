@@ -104,34 +104,6 @@ const Login = () => {
         <Button type="submit" className="w-full" disabled={loading}>
           {loading ? "Connexion en cours..." : "Se connecter"}
         </Button>
-        
-        <div className="text-center text-sm">
-          <p className="text-muted-foreground">
-            Utilisateurs de démonstration:
-          </p>
-          <div className="flex justify-around mt-2">
-            <Button
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                setEmail("admin@inuma.fr");
-                setPassword("Admin123!");
-              }}
-            >
-              Admin
-            </Button>
-            <Button
-              variant="outline" 
-              size="sm"
-              onClick={() => {
-                setEmail("agent@inuma.fr");
-                setPassword("Agent123!");
-              }}
-            >
-              Agent
-            </Button>
-          </div>
-        </div>
       </form>
     </AuthLayout>
   );
