@@ -7,6 +7,7 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
   DropdownMenuItem,
+  DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
@@ -64,12 +65,12 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
         <div className="space-y-1">
           {offer.priceMonthly > 0 && (
             <p className="font-bold">
-              {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-muted-foreground">/mois</span>
+              A partir de {Number(offer.priceMonthly).toFixed(2)} € <span className="text-sm font-normal text-muted-foreground">/mois</span>
             </p>
           )}
           {offer.setupFee > 0 && (
             <p className="text-sm text-muted-foreground">
-              Frais d'installation : {Number(offer.setupFee).toFixed(2)} €
+              Prix de création : {Number(offer.setupFee).toFixed(2)} €
             </p>
           )}
           {offer.priceMonthly === 0 && offer.setupFee === 0 && (
@@ -80,21 +81,24 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
           <div className="text-xs text-muted-foreground bg-gray-100 px-2 py-0.5 rounded-full">
             {offer.category}
           </div>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
-                <List className="h-4 w-4" />
-                <span className="sr-only">Fonctionnalités</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-[280px]">
-              {offer.features.map((feature, index) => (
-                <DropdownMenuItem key={index} className="py-2">
-                  {feature}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {offer.features && offer.features.length > 0 && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+                  <List className="h-4 w-4" />
+                  <span className="sr-only">Fonctionnalités</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[280px]">
+                <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
+                {offer.features.map((feature, index) => (
+                  <DropdownMenuItem key={index} className="py-2">
+                    {feature}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </CardContent>
       <CardFooter className="flex justify-between pt-2 border-t">
