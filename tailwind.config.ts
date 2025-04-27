@@ -12,6 +12,8 @@ export default {
   theme: {
     extend: {
       colors: {
+        'primary-red': '#bb0c19',
+        'primary-blue': '#272C57',
         'soft-purple': '#E5DEFF',
         'soft-blue': '#D3E4FD',
         'vivid-purple': '#8B5CF6',
