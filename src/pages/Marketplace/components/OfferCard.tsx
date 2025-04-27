@@ -1,19 +1,18 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-} from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { Offer } from "@/types";
 import { addToCart } from "../MarketplaceService";
-import { Eye, ShoppingCart, List } from "lucide-react";
+import { Eye, ShoppingCart, Info } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 interface OfferCardProps {
   offer: Offer;
@@ -23,6 +22,7 @@ interface OfferCardProps {
 const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
   const { toast } = useToast();
   const { auth } = useAuth();
+  const [showFeatures, setShowFeatures] = useState(false);
 
   const handleAddToCart = async () => {
     try {
@@ -82,26 +82,38 @@ const OfferCard: React.FC<OfferCardProps> = ({ offer, onViewDetails }) => {
             {offer.category}
           </div>
           {offer.features && offer.features.length > 0 && (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
-                >
-                  <List className="h-4 w-4 mr-1" />
-                  <span className="text-xs">Fonctionnalités</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[280px]">
-                <DropdownMenuLabel>Fonctionnalités</DropdownMenuLabel>
-                {offer.features.map((feature, index) => (
-                  <DropdownMenuItem key={index} className="py-2">
-                    {feature}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFeatures(true)}
+                className="h-7 px-3 bg-[#6E59A5] text-white hover:bg-[#7E69AB] hover:text-white border-none"
+              >
+                <Info className="h-4 w-4 mr-1" />
+                <span className="text-xs">Fonctionnalités</span>
+              </Button>
+
+              <Dialog open={showFeatures} onOpenChange={setShowFeatures}>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold mb-4">
+                      Fonctionnalités de {offer.name}
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <p className="text-sm text-gray-600">{offer.description}</p>
+                    <div className="space-y-2">
+                      {offer.features.map((feature, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="h-2 w-2 rounded-full bg-[#6E59A5] mt-2" />
+                          <p className="text-sm text-gray-700">{feature}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </>
           )}
         </div>
       </CardContent>
