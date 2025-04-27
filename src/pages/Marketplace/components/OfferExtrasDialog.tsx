@@ -1,12 +1,7 @@
-
 import React, { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { Minus, Plus, RotateCcw } from "lucide-react";
 
 interface Extra {
@@ -66,53 +61,55 @@ const OfferExtrasDialog: React.FC<OfferExtrasDialogProps> = ({
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div className="grid grid-cols-[2fr,1fr,1fr] gap-4 py-2 font-medium text-sm text-gray-600">
-            <div>Description</div>
-            <div>Prix unitaire</div>
-            <div>Quantité</div>
-          </div>
+        <ScrollArea className="h-[400px] pr-4">
+          <div className="space-y-4">
+            <div className="grid grid-cols-[2fr,1fr,1fr] gap-4 py-2 font-medium text-sm text-gray-600 sticky top-0 bg-background">
+              <div>Description</div>
+              <div>Prix unitaire</div>
+              <div>Quantité</div>
+            </div>
 
-          <div className="space-y-3">
-            {extras.map((extra) => (
-              <div
-                key={extra.id}
-                className="grid grid-cols-[2fr,1fr,1fr] gap-4 items-center py-2 border-t"
-              >
-                <div>
-                  <p className="font-medium text-gray-900">{extra.name}</p>
-                  {extra.description && (
-                    <p className="text-sm text-gray-600">{extra.description}</p>
-                  )}
+            <div className="space-y-3">
+              {extras.map((extra) => (
+                <div
+                  key={extra.id}
+                  className="grid grid-cols-[2fr,1fr,1fr] gap-4 items-center py-2 border-t"
+                >
+                  <div>
+                    <p className="font-medium text-gray-900">{extra.name}</p>
+                    {extra.description && (
+                      <p className="text-sm text-gray-600">{extra.description}</p>
+                    )}
+                  </div>
+                  <div className="text-gray-900">
+                    {Number(extra.unit_price).toFixed(2)} €
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleQuantityChange(extra.id, -1)}
+                    >
+                      <Minus className="h-4 w-4" />
+                    </Button>
+                    <span className="w-8 text-center">
+                      {quantities[extra.id] || 0}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-8 w-8"
+                      onClick={() => handleQuantityChange(extra.id, 1)}
+                    >
+                      <Plus className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
-                <div className="text-gray-900">
-                  {Number(extra.unit_price).toFixed(2)} €
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => handleQuantityChange(extra.id, -1)}
-                  >
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                  <span className="w-8 text-center">
-                    {quantities[extra.id] || 0}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    className="h-8 w-8"
-                    onClick={() => handleQuantityChange(extra.id, 1)}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        </ScrollArea>
 
         <div className="flex justify-between mt-6 pt-4 border-t">
           <Button
