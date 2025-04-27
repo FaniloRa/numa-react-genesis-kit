@@ -33,11 +33,6 @@ export interface OfferExtra {
   unitPrice: number;
 }
 
-export interface SelectedExtra {
-  extraId: string;
-  quantity: number;
-}
-
 export interface Offer {
   id: string;
   name: string;
@@ -58,7 +53,6 @@ export interface CartItem {
   offer: Offer;
   quantity: number;
   offerPlateId?: string;
-  selectedExtras?: SelectedExtra[];
 }
 
 export interface OfferPlate {
