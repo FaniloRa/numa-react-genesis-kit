@@ -77,6 +77,7 @@ export interface Quote {
   agentId: string;
   totalAmount: number;
   status: string;
+  paymentStatus: string;
   createdAt: string;
   client?: User;
   agent?: User;
