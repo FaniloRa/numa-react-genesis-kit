@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, CartItem } from "@/types";
 import { createNotification } from "@/services/NotificationService";
@@ -240,6 +239,44 @@ export const fetchPaymentInfoByQuoteId = async (quoteId: string) => {
     return data;
   } catch (error) {
     console.error("Error fetching payment info:", error);
+    throw error;
+  }
+};
+
+export const fetchClientByQuoteId = async (quoteId: string) => {
+  try {
+    // Fetch the quote to get the client_id
+    const { data: quote, error: quoteError } = await supabase
+      .from("quotes")
+      .select("client_id")
+      .eq("id", quoteId)
+      .single();
+    
+    if (quoteError) throw quoteError;
+    
+    if (!quote.client_id) {
+      throw new Error("Ce devis n'a pas de client associé");
+    }
+    
+    // Get the client details
+    const { data: client, error: clientError } = await supabase
+      .from("profiles")
+      .select(`
+        id,
+        first_name,
+        last_name,
+        email,
+        phone,
+        company_name
+      `)
+      .eq("id", quote.client_id)
+      .single();
+    
+    if (clientError) throw clientError;
+    
+    return client;
+  } catch (error) {
+    console.error("Error fetching client for quote:", error);
     throw error;
   }
 };

@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Quote, CartItem, UserRole } from "@/types";
-import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus, fetchPaymentInfoByQuoteId } from "../QuotesService";
+import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus, fetchPaymentInfoByQuoteId, fetchClientByQuoteId } from "../QuotesService";
 import { useAuth } from "@/lib/auth";
 import { ArrowLeft, File, Send, Check, X, Printer, SendToBack } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
@@ -26,6 +25,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
   const [quoteDetails, setQuoteDetails] = useState<any>(null);
   const [quoteItems, setQuoteItems] = useState<CartItem[]>([]);
   const [paymentInfo, setPaymentInfo] = useState<any>(null);
+  const [client, setClient] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
@@ -38,15 +38,17 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     try {
       setLoading(true);
       
-      const [details, items, payment] = await Promise.all([
+      const [details, items, payment, clientData] = await Promise.all([
         fetchQuoteDetails(quote.id),
         fetchQuoteItems(quote.offerPlateId),
-        fetchPaymentInfoByQuoteId(quote.id).catch(() => null)
+        fetchPaymentInfoByQuoteId(quote.id).catch(() => null),
+        fetchClientByQuoteId(quote.id).catch(() => null)
       ]);
       
       setQuoteDetails(details);
       setQuoteItems(items);
       setPaymentInfo(payment);
+      setClient(clientData);
     } catch (error: any) {
       toast({
         title: "Erreur de chargement",
@@ -203,9 +205,11 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     return acc + monthlyTotal + setupTotal;
   }, 0);
 
-  const clientName = quoteDetails?.client ? 
-    `${quoteDetails.client.first_name || ""} ${quoteDetails.client.last_name || ""}`.trim() : 
-    "Client";
+  const clientName = client ? 
+    `${client.first_name || ""} ${client.last_name || ""}`.trim() : 
+    quoteDetails?.client ? 
+      `${quoteDetails.client.first_name || ""} ${quoteDetails.client.last_name || ""}`.trim() : 
+      "Client";
 
   return (
     <div className="text-left">
