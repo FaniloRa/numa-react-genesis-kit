@@ -3,6 +3,7 @@ import React from "react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Quote, CartItem } from "@/types";
+import CustomQuotesHeader from "./CustomQuotesHeader";
 
 interface DevisTemplateProps {
   quote: Quote;
@@ -27,15 +28,17 @@ const DevisTemplate: React.FC<DevisTemplateProps> = ({ quote, items, clientName,
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl bg-white shadow-lg print:shadow-none">
-        <div className="p-8 print:p-0">
+      <CustomQuotesHeader />
+        <div className="top-[-100px] relative p-8 print:p-0">
           {/* Header Section */}
-          <div className="relative mb-6 h-[300px] bg-no-repeat bg-cover bg-top" 
+          
+          <div className="top-[-150px] relative mb-6 h-[300px] bg-no-repeat bg-cover bg-top" 
           style={{ backgroundImage: "url('/images/inum.png')" }}>
             <div className="left-[100px] top-[100px] bg text-white p-4 rounded-t-md relative items-center">
               <h1 className="text-xl font-bold text-[25px]">Devis n° {quoteNumber}</h1>
             </div>
             
-            <div className="relative mt-[200px] left-[350px] justify-between pt-2 pb-4">
+            <div className="relative mt-[200px] left-[430px] justify-between pt-2 pb-4">
               <div className="w-1/2"></div>
               <div className="w-1/2 text-right z-10 relative pr-4 pt-2">
                 <p className="text-xs">131, continental Dr, Suite 305 Newark, DE 19713</p>
@@ -90,7 +93,7 @@ const DevisTemplate: React.FC<DevisTemplateProps> = ({ quote, items, clientName,
           </div>
 
           {/* Total Section */}
-          <div className="mb-6">
+          <div className="mb-6 mt-[100px]">
             <div className="flex flex-col items-end">
               <div className="w-1/3">
                 <div className="flex justify-between py-1">

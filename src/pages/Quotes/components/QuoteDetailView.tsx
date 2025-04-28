@@ -147,7 +147,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
       );
     }
 
-    if (isAgent && quote.status === "draft") {
+    if (isAgent && quote.status === "pending") {
       return (
         <Button
           onClick={() => handleStatusUpdate("pending")}
@@ -324,7 +324,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                   bic: paymentInfo.bic
                 } : undefined}
               />
-              {quote.status === 'draft' && !isClient && !isAdmin && (
+              {quote.status === '' && !isClient && !isAdmin && (
                 <div className="mt-6 flex justify-center">
                   <Button 
                     onClick={() => {
