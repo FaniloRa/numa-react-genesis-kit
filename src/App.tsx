@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+
+import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/components/AuthProvider';
 import { MainLayout } from '@/components/layout/MainLayout';
 import ProtectedRoute from '@/components/ProtectedRoute';
@@ -23,104 +24,102 @@ import './App.css';
 function App() {
   return (
     <AuthProvider>
-      <Router>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Dashboard />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/marketplace"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Marketplace />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/clients"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Clients />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/folders"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Folders />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quotes"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Quotes />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/quotes/:id"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <QuoteDetailPage />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/offer-plates/:id"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <OfferPlateDetailPage />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <CartPage />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/settings"
-            element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <Settings />
-                </MainLayout>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Router>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route
+          path="/dashboard"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Dashboard />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/marketplace"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Marketplace />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/clients"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Clients />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/folders"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Folders />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quotes"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Quotes />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/quotes/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <QuoteDetailPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/offer-plates/:id"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <OfferPlateDetailPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <CartPage />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <Settings />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
       <Toaster />
     </AuthProvider>
   );
