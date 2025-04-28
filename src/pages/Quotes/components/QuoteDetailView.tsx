@@ -262,9 +262,9 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                 {getStatusText(quote.status)}
               </span>
               <span className={`text-xs px-2 py-1 rounded-full ${
-                quote.payment_status === "Payé" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
+                quote.paymentStatus === "Payé" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
               }`}>
-                {quote.payment_status}
+                {quote.paymentStatus}
               </span>
             </div>
           </div>
@@ -332,13 +332,13 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                 </Button>
                 <div className="flex gap-2">
                   {renderStatusActions()}
-                  {quote.payment_status !== "Payé" && quote.status === "accepted" && (
+                  {quote.paymentStatus !== "Payé" && quote.status === "accepted" && (
                     <Button 
                       onClick={handlePayment}
                       disabled={processingAction}
                       className="bg-green-600 hover:bg-green-700"
                     >
-                      <euro className="h-4 w-4 mr-2" />
+                      <i className="h-4 w-4 mr-2">€</i>
                       Payer
                     </Button>
                   )}

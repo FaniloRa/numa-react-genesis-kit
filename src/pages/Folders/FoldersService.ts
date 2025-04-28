@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Folder, OfferPlate, Quote } from "@/types";
 import { mapFolders, mapFolder, mapOfferPlates, mapQuotes } from "@/utils/dataMapper";
@@ -67,16 +66,17 @@ export const fetchOfferPlatesForFolder = async (folderId: string) => {
 
 export const fetchQuotesForFolder = async (folderId: string) => {
   try {
-    // First get the folder to get client_id and agent_id
-    const { data: folder, error: folderError } = await supabase
-      .from("folders")
-      .select("client_id, agent_id")
-      .eq("id", folderId)
-      .single();
+    const { data: offerPlatesData, error: offerPlatesError } = await supabase
+      .from("offer_plates")
+      .select("id")
+      .eq("folder_id", folderId);
     
-    if (folderError) throw folderError;
+    if (offerPlatesError) throw offerPlatesError;
     
-    // Then get all quotes for this client-agent pair
+    if (!offerPlatesData.length) return [];
+    
+    const offerPlateIds = offerPlatesData.map(plate => plate.id);
+    
     const { data, error } = await supabase
       .from("quotes")
       .select(`
@@ -85,17 +85,17 @@ export const fetchQuotesForFolder = async (folderId: string) => {
         client_id,
         agent_id,
         status,
+        payment_status,
         total_amount,
         created_at
       `)
-      .eq("client_id", folder.client_id)
-      .eq("agent_id", folder.agent_id)
-      .order("created_at", { ascending: false });
+      .in("offer_plate_id", offerPlateIds);
     
     if (error) throw error;
+    
     return mapQuotes(data);
   } catch (error) {
-    console.error("Error fetching quotes:", error);
+    console.error("Error fetching quotes for folder:", error);
     throw error;
   }
 };
