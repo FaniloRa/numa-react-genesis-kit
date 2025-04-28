@@ -1,6 +1,9 @@
-
 import React from "react";
 import { CartItem } from "@/types";
+import { Button } from "@/components/ui/button";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FileText } from "lucide-react";
+import OfferPlatePDF from "./OfferPlatePDF";
 
 interface OfferPlatePreviewProps {
   items: CartItem[];
@@ -10,6 +13,20 @@ interface OfferPlatePreviewProps {
 const OfferPlatePreview: React.FC<OfferPlatePreviewProps> = ({ items, offerPlate }) => {
   return (
     <div className="mx-auto max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+      <div className="flex justify-end p-4">
+        <PDFDownloadLink
+          document={<OfferPlatePDF items={items} offerPlate={offerPlate} />}
+          fileName={`plaquette-${offerPlate.name.toLowerCase().replace(/\s+/g, '-')}.pdf`}
+        >
+          {({ loading }) => (
+            <Button disabled={loading} variant="outline">
+              <FileText className="h-4 w-4 mr-2" />
+              {loading ? "Génération..." : "Exporter en PDF"}
+            </Button>
+          )}
+        </PDFDownloadLink>
+      </div>
+
       {/* Header */}
       <div className="bg-gradient-to-r from-[#9b87f5] to-[#7E69AB] text-white p-6">
         <h2 className="text-2xl font-bold">Plaquette d'offres</h2>

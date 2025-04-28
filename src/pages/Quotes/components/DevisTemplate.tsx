@@ -1,8 +1,11 @@
-
 import React from "react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { Quote, CartItem } from "@/types";
+import { Button } from "@/components/ui/button";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { FileText } from "lucide-react";
+import QuotePDF from "./QuotePDF";
 import CustomQuotesHeader from "./CustomQuotesHeader";
 
 interface DevisTemplateProps {
@@ -28,7 +31,28 @@ const DevisTemplate: React.FC<DevisTemplateProps> = ({ quote, items, clientName,
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-4xl bg-white shadow-lg print:shadow-none">
-      <CustomQuotesHeader />
+        <div className="flex justify-end p-4">
+          <PDFDownloadLink
+            document={
+              <QuotePDF 
+                quote={quote} 
+                items={items} 
+                clientName={clientName}
+                paymentInfo={paymentInfo}
+              />
+            }
+            fileName={`devis-${quote.id.substring(0, 8)}.pdf`}
+          >
+            {({ loading }) => (
+              <Button disabled={loading} variant="outline">
+                <FileText className="h-4 w-4 mr-2" />
+                {loading ? "Génération..." : "Exporter en PDF"}
+              </Button>
+            )}
+          </PDFDownloadLink>
+        </div>
+        
+        <CustomQuotesHeader />
         <div className="top-[-100px] relative p-8 print:p-0">
           {/* Header Section */}
           
