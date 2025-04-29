@@ -18,6 +18,8 @@ import QuoteDetailPage from '@/pages/Quotes/components/QuoteDetailPage';
 import CartPage from '@/pages/Cart';
 import OfferPlateDetailPage from '@/pages/OfferPlates/OfferPlateDetailPage';
 import Settings from '@/pages/Settings';
+import PaymentSuccess from '@/pages/Payment/PaymentSuccess';
+import PaymentFailure from '@/pages/Payment/PaymentFailure';
 
 import './App.css';
 
@@ -114,6 +116,26 @@ function App() {
             <ProtectedRoute>
               <MainLayout>
                 <Settings />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment-success"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <PaymentSuccess />
+              </MainLayout>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/payment-failure"
+          element={
+            <ProtectedRoute>
+              <MainLayout>
+                <PaymentFailure />
               </MainLayout>
             </ProtectedRoute>
           }

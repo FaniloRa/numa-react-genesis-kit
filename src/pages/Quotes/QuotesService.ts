@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, CartItem } from "@/types";
 import { createNotification } from "@/services/NotificationService";
@@ -14,6 +15,7 @@ export const fetchQuoteById = async (quoteId: string) => {
         client_id,
         status,
         total_amount,
+        payment_status,
         created_at
       `)
       .eq("id", quoteId)
@@ -37,6 +39,7 @@ export const fetchQuotes = async (userId: string, isAgent: boolean, isAdmin: boo
       agent_id,
       status,
       total_amount,
+      payment_status,
       created_at
     `);
 
@@ -69,6 +72,7 @@ export const fetchQuoteDetails = async (quoteId: string) => {
         agent_id,
         status,
         total_amount,
+        payment_status,
         created_at,
         offer_plates (
           id,
@@ -277,6 +281,35 @@ export const fetchClientByQuoteId = async (quoteId: string) => {
     return client;
   } catch (error) {
     console.error("Error fetching client for quote:", error);
+    throw error;
+  }
+};
+
+export const createPaymentLink = async (quoteId: string, totalAmount: number, clientEmail: string) => {
+  try {
+    const { data, error } = await supabase.functions.invoke('payment-link', {
+      body: { quoteId, totalAmount, clientEmail }
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating payment link:", error);
+    throw error;
+  }
+};
+
+export const updateQuotePaymentStatus = async (quoteId: string, paymentStatus: string) => {
+  try {
+    const { error } = await supabase
+      .from("quotes")
+      .update({ payment_status: paymentStatus })
+      .eq("id", quoteId);
+    
+    if (error) throw error;
+    return true;
+  } catch (error) {
+    console.error("Error updating quote payment status:", error);
     throw error;
   }
 };

@@ -1,16 +1,25 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
 import { Quote, CartItem, UserRole } from "@/types";
-import { fetchQuoteDetails, fetchQuoteItems, updateQuoteStatus, fetchPaymentInfoByQuoteId, fetchClientByQuoteId } from "../QuotesService";
+import { 
+  fetchQuoteDetails, 
+  fetchQuoteItems, 
+  updateQuoteStatus, 
+  fetchPaymentInfoByQuoteId, 
+  fetchClientByQuoteId,
+  createPaymentLink
+} from "../QuotesService";
 import { useAuth } from "@/lib/auth";
-import { ArrowLeft, File, Send, Check, X, Printer, SendToBack } from "lucide-react";
+import { ArrowLeft, File, Send, Check, X, Printer, SendToBack, CreditCard } from "lucide-react";
 import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import DevisTemplate from "./DevisTemplate";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 interface QuoteDetailViewProps {
   quote: Quote;
@@ -29,6 +38,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
   const [loading, setLoading] = useState(true);
   const [processingAction, setProcessingAction] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
+  const [processingPayment, setProcessingPayment] = useState(false);
 
   const isAdmin = hasRole(UserRole.ADMIN);
   const isAgent = hasRole(UserRole.AGENT) && !isAdmin;
@@ -91,6 +101,44 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     setShowPreview(true);
   };
 
+  const handlePayment = async () => {
+    if (!client?.email) {
+      toast({
+        title: "Erreur",
+        description: "L'email du client est requis pour le paiement.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setProcessingPayment(true);
+      const response = await createPaymentLink(
+        quote.id,
+        Number(quote.totalAmount) * 100, // Montant en centimes
+        client.email
+      );
+      
+      if (response?.url) {
+        window.location.href = response.url;
+      } else {
+        toast({
+          title: "Erreur",
+          description: "Impossible de générer le lien de paiement.",
+          variant: "destructive",
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: "Erreur de paiement",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setProcessingPayment(false);
+    }
+  };
+
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "pending":
@@ -106,6 +154,12 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const getPaymentStatusStyle = (status: string) => {
+    return status === "Payé" 
+      ? "bg-green-100 text-green-800" 
+      : "bg-gray-100 text-gray-800";
   };
 
   const getStatusText = (status: string) => {
@@ -211,6 +265,11 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
       `${quoteDetails.client.first_name || ""} ${quoteDetails.client.last_name || ""}`.trim() : 
       "Client";
 
+  // Affichage du bouton de paiement uniquement pour les clients et si le devis est accepté et non payé
+  const showPaymentButton = isClient && 
+    quote.status === "accepted" && 
+    quote.paymentStatus === "Non Payé";
+
   return (
     <div className="text-left">
       <div className="flex items-center mb-4">
@@ -225,11 +284,18 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
         <CardHeader>
           <div className="flex justify-between items-start">
             <CardTitle>Détails du devis</CardTitle>
-            <span
-              className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(quote.status)}`}
-            >
-              {getStatusText(quote.status)}
-            </span>
+            <div className="flex gap-2">
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(quote.status)}`}
+              >
+                {getStatusText(quote.status)}
+              </span>
+              <span
+                className={`text-xs px-2 py-1 rounded-full ${getPaymentStatusStyle(quote.paymentStatus)}`}
+              >
+                {quote.paymentStatus}
+              </span>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
@@ -245,6 +311,9 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Client</h3>
                   <p>{clientName}</p>
+                  {client?.email && (
+                    <p className="text-sm text-muted-foreground">{client.email}</p>
+                  )}
                 </div>
                 <div>
                   <h3 className="text-sm font-medium text-muted-foreground">Plaquette d'offres</h3>
@@ -293,7 +362,19 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                   <Printer className="h-4 w-4 mr-2" />
                   Aperçu Devis
                 </Button>
-                {renderStatusActions()}
+                <div className="flex gap-2">
+                  {showPaymentButton && (
+                    <Button 
+                      onClick={handlePayment}
+                      disabled={processingPayment}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <CreditCard className="h-4 w-4 mr-2" />
+                      {processingPayment ? "Traitement..." : "Payer maintenant"}
+                    </Button>
+                  )}
+                  {renderStatusActions()}
+                </div>
               </div>
             </div>
           )}

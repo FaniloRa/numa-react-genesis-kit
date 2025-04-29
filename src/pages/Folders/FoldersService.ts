@@ -86,6 +86,7 @@ export const fetchQuotesForFolder = async (folderId: string) => {
         agent_id,
         status,
         total_amount,
+        payment_status,
         created_at
       `)
       .eq("client_id", folder.client_id)
