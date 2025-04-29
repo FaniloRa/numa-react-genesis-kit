@@ -77,7 +77,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         setAuth({
           user: {
             id: userId,
-            email: session.user.email || "",
+            email: session.user.email || data.email || "",
             firstName: data.first_name,
             lastName: data.last_name,
             phone: data.phone,

@@ -1,4 +1,3 @@
-
 import { supabase } from "@/integrations/supabase/client";
 import { Quote, CartItem } from "@/types";
 import { createNotification } from "@/services/NotificationService";
@@ -270,26 +269,20 @@ export const fetchClientByQuoteId = async (quoteId: string) => {
         first_name,
         last_name,
         phone,
-        company_name
+        company_name,
+        email
       `)
       .eq("id", quote.client_id)
       .single();
     
     if (clientProfileError) throw clientProfileError;
     
-    // Get the client email from auth.users
-    const { data: clientAuth, error: clientAuthError } = await supabase.auth.admin.getUserById(
-      quote.client_id
-    );
-    
-    if (clientAuthError) throw clientAuthError;
-    
-    // Combine the data
+    // Use email directly from profiles table
     return {
       id: clientProfile.id,
       first_name: clientProfile.first_name,
       last_name: clientProfile.last_name,
-      email: clientAuth.user?.email || "",
+      email: clientProfile.email || "",
       phone: clientProfile.phone,
       company_name: clientProfile.company_name
     };

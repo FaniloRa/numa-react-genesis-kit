@@ -314,6 +314,7 @@ export type Database = {
           business_sector: string | null
           company_name: string | null
           created_at: string | null
+          email: string | null
           email_notifications: boolean | null
           first_name: string | null
           id: string
@@ -332,6 +333,7 @@ export type Database = {
           business_sector?: string | null
           company_name?: string | null
           created_at?: string | null
+          email?: string | null
           email_notifications?: boolean | null
           first_name?: string | null
           id: string
@@ -350,6 +352,7 @@ export type Database = {
           business_sector?: string | null
           company_name?: string | null
           created_at?: string | null
+          email?: string | null
           email_notifications?: boolean | null
           first_name?: string | null
           id?: string

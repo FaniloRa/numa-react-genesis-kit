@@ -16,6 +16,7 @@ export const fetchClients = async (searchTerm?: string) => {
         address,
         birth_date,
         role,
+        email,
         created_at
       `)
       .eq("role", "client");
@@ -30,11 +31,10 @@ export const fetchClients = async (searchTerm?: string) => {
     
     if (error) throw error;
     
-    // Since we can't directly query auth.users, we'll use placeholder emails
-    // based on first and last name as a fallback
+    // Now use the email stored directly in profiles
     const users = profiles.map(profile => ({
       ...profile,
-      email: `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`
+      email: profile.email || `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`
     }));
     
     return mapUsers(users);
@@ -57,6 +57,7 @@ export const fetchClientDetails = async (clientId: string) => {
         address,
         birth_date,
         role,
+        email,
         created_at
       `)
       .eq("id", clientId)
@@ -64,8 +65,8 @@ export const fetchClientDetails = async (clientId: string) => {
     
     if (error) throw error;
     
-    // Create a placeholder email based on name
-    const email = `${data.first_name?.toLowerCase() || ''}${data.last_name?.toLowerCase() || ''}@example.com`;
+    // Use email from profiles if available
+    const email = data.email || `${data.first_name?.toLowerCase() || ''}${data.last_name?.toLowerCase() || ''}@example.com`;
     
     // Add email field to match User interface
     const user = {
