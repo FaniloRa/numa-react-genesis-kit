@@ -31,7 +31,7 @@ export const fetchClients = async (searchTerm?: string) => {
     
     if (error) throw error;
     
-    // Now use the email stored directly in profiles
+    // Use the email directly from profiles
     const users = profiles.map(profile => ({
       ...profile,
       email: profile.email || `${profile.first_name?.toLowerCase() || ''}${profile.last_name?.toLowerCase() || ''}@example.com`
