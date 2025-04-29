@@ -13,7 +13,6 @@ export const fetchQuoteById = async (quoteId: string) => {
         agent_id,
         client_id,
         status,
-        payment_status,
         total_amount,
         created_at
       `)
@@ -154,21 +153,6 @@ export const updateQuoteStatus = async (quoteId: string, status: string) => {
     return true;
   } catch (error) {
     console.error("Error updating quote status:", error);
-    throw error;
-  }
-};
-
-export const updateQuotePaymentStatus = async (quoteId: string, paymentStatus: string) => {
-  try {
-    const { error } = await supabase
-      .from("quotes")
-      .update({ payment_status: paymentStatus })
-      .eq("id", quoteId);
-    
-    if (error) throw error;
-    return true;
-  } catch (error) {
-    console.error("Error updating quote payment status:", error);
     throw error;
   }
 };

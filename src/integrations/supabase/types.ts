@@ -371,7 +371,6 @@ export type Database = {
           created_at: string | null
           id: string
           offer_plate_id: string
-          payment_status: string
           status: string
           total_amount: number
           updated_at: string | null
@@ -382,7 +381,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           offer_plate_id: string
-          payment_status?: string
           status?: string
           total_amount: number
           updated_at?: string | null
@@ -393,7 +391,6 @@ export type Database = {
           created_at?: string | null
           id?: string
           offer_plate_id?: string
-          payment_status?: string
           status?: string
           total_amount?: number
           updated_at?: string | null

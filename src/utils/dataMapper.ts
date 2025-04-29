@@ -47,7 +47,6 @@ export const mapQuote = (data: any) => {
     agentId: data.agent_id,
     totalAmount: data.total_amount,
     status: data.status,
-    paymentStatus: data.payment_status,
     createdAt: data.created_at
   };
 };

@@ -11,7 +11,6 @@ import { formatDistanceToNow, format } from "date-fns";
 import { fr } from "date-fns/locale";
 import DevisTemplate from "./DevisTemplate";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { createPaymentLink } from "@/services/PaymentService";
 
 interface QuoteDetailViewProps {
   quote: Quote;
@@ -90,37 +89,6 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
 
   const handlePrint = () => {
     setShowPreview(true);
-  };
-
-  const handlePayment = async () => {
-    if (!client || !totalAmount) return;
-
-    try {
-      setProcessingAction(true);
-      
-      const paymentData = {
-        amount: totalAmount,
-        validDuration: 4,
-        clientName: `${client.first_name} ${client.last_name}`.trim(),
-        reference: `DEVIS-${quote.id.substring(0, 8)}`,
-        description: "Plaquette d'offres",
-        successUrl: `${window.location.origin}/quotes/${quote.id}?payment=success`,
-        failureUrl: `${window.location.origin}/quotes/${quote.id}?payment=failure`,
-        notificationUrl: `${window.location.origin}/api/payment-webhook`
-      };
-
-      const response = await createPaymentLink(paymentData);
-      
-      window.location.href = response.paymentUrl;
-    } catch (error: any) {
-      toast({
-        title: "Erreur de paiement",
-        description: error.message,
-        variant: "destructive",
-      });
-    } finally {
-      setProcessingAction(false);
-    }
   };
 
   const getStatusStyle = (status: string) => {
@@ -257,16 +225,11 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
         <CardHeader>
           <div className="flex justify-between items-start">
             <CardTitle>Détails du devis</CardTitle>
-            <div className="flex flex-col items-end gap-2">
-              <span className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(quote.status)}`}>
-                {getStatusText(quote.status)}
-              </span>
-              <span className={`text-xs px-2 py-1 rounded-full ${
-                quote.paymentStatus === "Payé" ? "bg-green-100 text-green-800" : "bg-yellow-100 text-yellow-800"
-              }`}>
-                {quote.paymentStatus}
-              </span>
-            </div>
+            <span
+              className={`text-xs px-2 py-1 rounded-full ${getStatusStyle(quote.status)}`}
+            >
+              {getStatusText(quote.status)}
+            </span>
           </div>
         </CardHeader>
         <CardContent>
@@ -330,19 +293,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
                   <Printer className="h-4 w-4 mr-2" />
                   Aperçu Devis
                 </Button>
-                <div className="flex gap-2">
-                  {renderStatusActions()}
-                  {quote.paymentStatus !== "Payé" && quote.status === "accepted" && (
-                    <Button 
-                      onClick={handlePayment}
-                      disabled={processingAction}
-                      className="bg-green-600 hover:bg-green-700"
-                    >
-                      <i className="h-4 w-4 mr-2">€</i>
-                      Payer
-                    </Button>
-                  )}
-                </div>
+                {renderStatusActions()}
               </div>
             </div>
           )}
