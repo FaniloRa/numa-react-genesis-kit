@@ -155,7 +155,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       } = userData;
       const role = userData.role || UserRole.CLIENT;
 
-      // Register the user
+      // Register the user with metadata that will be stored in the profiles table
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -163,13 +163,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
           data: {
             first_name: firstName,
             last_name: lastName,
-            phone: phone,
-            address: address,
-            birth_date: birthDate,
+            phone: phone || "",
+            address: address || "",
+            birth_date: birthDate || "",
             business_sector: businessSector,
             manager_name: managerName,
             company_name: companyName,
             role: role,
+            email: email, // Explicitly store email in metadata
           },
         },
       });
