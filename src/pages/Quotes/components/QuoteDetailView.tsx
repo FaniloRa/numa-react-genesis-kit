@@ -259,6 +259,7 @@ const QuoteDetailView: React.FC<QuoteDetailViewProps> = ({ quote, onBack, onUpda
     return acc + monthlyTotal + setupTotal;
   }, 0);
 
+  // Get client name from the client data that was fetched
   const clientName = client ? 
     `${client.first_name || ""} ${client.last_name || ""}`.trim() : 
     quoteDetails?.client ? 

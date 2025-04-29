@@ -262,23 +262,37 @@ export const fetchClientByQuoteId = async (quoteId: string) => {
       throw new Error("Ce devis n'a pas de client associé");
     }
     
-    // Get the client details
-    const { data: client, error: clientError } = await supabase
+    // Get the client details from profiles
+    const { data: clientProfile, error: clientProfileError } = await supabase
       .from("profiles")
       .select(`
         id,
         first_name,
         last_name,
-        email,
         phone,
         company_name
       `)
       .eq("id", quote.client_id)
       .single();
     
-    if (clientError) throw clientError;
+    if (clientProfileError) throw clientProfileError;
     
-    return client;
+    // Get the client email from auth.users
+    const { data: clientAuth, error: clientAuthError } = await supabase.auth.admin.getUserById(
+      quote.client_id
+    );
+    
+    if (clientAuthError) throw clientAuthError;
+    
+    // Combine the data
+    return {
+      id: clientProfile.id,
+      first_name: clientProfile.first_name,
+      last_name: clientProfile.last_name,
+      email: clientAuth.user?.email || "",
+      phone: clientProfile.phone,
+      company_name: clientProfile.company_name
+    };
   } catch (error) {
     console.error("Error fetching client for quote:", error);
     throw error;

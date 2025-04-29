@@ -1,36 +1,43 @@
 
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, Link, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { fetchQuoteById } from '../Quotes/QuotesService';
-import { Quote } from '@/types';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, ArrowLeft } from 'lucide-react';
+import { updateQuotePaymentStatus } from '../Quotes/QuotesService';
+import { useToast } from '@/hooks/use-toast';
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const quoteId = searchParams.get('quoteId');
   const navigate = useNavigate();
-  const [quote, setQuote] = useState<Quote | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  const [isUpdating, setIsUpdating] = useState(true);
 
   useEffect(() => {
-    const loadQuote = async () => {
+    const updatePaymentStatus = async () => {
       if (!quoteId) return;
       
       try {
-        setLoading(true);
-        const data = await fetchQuoteById(quoteId);
-        setQuote(data);
+        await updateQuotePaymentStatus(quoteId, "Payé");
+        setIsUpdating(false);
+        toast({
+          title: "Paiement réussi",
+          description: "Votre paiement a été traité avec succès et votre devis a été mis à jour.",
+        });
       } catch (error) {
-        console.error("Error fetching quote:", error);
-      } finally {
-        setLoading(false);
+        console.error("Error updating payment status:", error);
+        setIsUpdating(false);
+        toast({
+          title: "Information",
+          description: "Paiement réussi, mais le statut du devis n'a pas pu être mis à jour automatiquement.",
+          variant: "destructive",
+        });
       }
     };
-    
-    loadQuote();
-  }, [quoteId]);
+
+    updatePaymentStatus();
+  }, [quoteId, toast]);
 
   return (
     <div className="container mx-auto py-10 px-4">
@@ -43,28 +50,17 @@ const PaymentSuccess = () => {
         </CardHeader>
         <CardContent className="space-y-6">
           <p className="text-center text-muted-foreground">
-            Votre paiement a été traité avec succès.
+            Votre paiement a été traité avec succès. Merci pour votre achat!
           </p>
           
-          {loading ? (
-            <div className="flex justify-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-            </div>
-          ) : quote ? (
-            <div className="space-y-2 text-center">
-              <p>Devis #{quote.id.substring(0, 8)}</p>
-              <p className="font-medium">Montant payé: {Number(quote.totalAmount).toFixed(2)} €</p>
-              <p className="text-sm text-muted-foreground">
-                Une confirmation a été envoyée par email.
-              </p>
-            </div>
-          ) : null}
-          
           <div className="flex flex-col space-y-2">
-            <Button onClick={() => navigate(`/quotes/${quoteId}`)}>
-              Voir les détails du devis
-            </Button>
+            {quoteId && (
+              <Button onClick={() => navigate(`/quotes/${quoteId}`)}>
+                Retourner au devis
+              </Button>
+            )}
             <Button variant="outline" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
             </Button>
           </div>

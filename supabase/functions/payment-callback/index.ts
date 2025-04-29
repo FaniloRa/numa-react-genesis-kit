@@ -1,63 +1,79 @@
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.33.1';
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
 serve(async (req) => {
   // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+  if (req.method === "OPTIONS") {
+    return new Response("ok", { headers: corsHeaders });
   }
 
   try {
-    // Get the URL parameters
+    // Get the quoteId from the URL
     const url = new URL(req.url);
-    const quoteId = url.searchParams.get("quoteId");
+    const pathSegments = url.pathname.split('/');
+    const quoteId = pathSegments[pathSegments.length - 1];
 
-    // Get the payment status from the request body
-    const { status } = await req.json();
-    
     if (!quoteId) {
-      throw new Error("Quote ID is required");
+      return new Response(
+        JSON.stringify({ error: "Quote ID is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
     }
 
-    console.log(`Received payment callback for quote ${quoteId} with status: ${status}`);
+    // Get payment status from request body
+    const { status } = await req.json();
 
-    // If the payment was successful, update the quote's payment status
-    if (status === "PAID" || status === "SUCCESS") {
-      // Create supabase client with service role key for admin privileges
-      const supabaseUrl = Deno.env.get("SUPABASE_URL") || "";
-      const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-      const supabase = createClient(supabaseUrl, supabaseKey);
+    if (!status) {
+      return new Response(
+        JSON.stringify({ error: "Payment status is required" }),
+        {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        }
+      );
+    }
 
-      // Update the quote
-      const { data, error } = await supabase
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') as string;
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') as string;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Update quote payment status
+    if (status === 'success') {
+      const { error } = await supabase
         .from('quotes')
         .update({ payment_status: 'Payé' })
         .eq('id', quoteId);
 
-      if (error) throw error;
-      
-      console.log(`Updated payment status for quote ${quoteId} to Payé`);
-      
-      return new Response(JSON.stringify({ success: true }), {
-        headers: { 'Content-Type': 'application/json', ...corsHeaders },
-      });
+      if (error) {
+        throw new Error(`Failed to update quote: ${error.message}`);
+      }
     }
-    
-    return new Response(JSON.stringify({ success: false, message: "Payment not successful" }), {
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+
+    return new Response(
+      JSON.stringify({ success: true, message: "Payment status updated" }),
+      {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   } catch (error) {
-    console.error("Error processing payment callback:", error);
-    
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders },
-    });
+    console.error("Error:", error.message);
+    return new Response(
+      JSON.stringify({ error: error.message }),
+      {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      }
+    );
   }
 });
