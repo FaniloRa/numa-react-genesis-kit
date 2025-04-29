@@ -3,7 +3,7 @@ import React from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { XCircle } from 'lucide-react';
+import { XCircle, ArrowLeft } from 'lucide-react';
 
 const PaymentFailure = () => {
   const [searchParams] = useSearchParams();
@@ -31,6 +31,7 @@ const PaymentFailure = () => {
               </Button>
             )}
             <Button variant="outline" onClick={() => navigate('/dashboard')}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Retour au tableau de bord
             </Button>
           </div>

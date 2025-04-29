@@ -121,7 +121,7 @@ function App() {
           }
         />
         <Route
-          path="/payment-success"
+          path="/payment/success"
           element={
             <ProtectedRoute>
               <MainLayout>
@@ -131,7 +131,7 @@ function App() {
           }
         />
         <Route
-          path="/payment-failure"
+          path="/payment/failure"
           element={
             <ProtectedRoute>
               <MainLayout>
